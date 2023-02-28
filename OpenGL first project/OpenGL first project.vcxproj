@@ -155,11 +155,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\GameOfLife.cpp" />
+    <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\DrawBoard.cpp" />
+    <ClCompile Include="src\Mouse.cpp" />
+    <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shader\fragment.shader" />
     <None Include="res\shader\vertex.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\GameOfLife.h" />
+    <ClInclude Include="src\IndexBuffer.h" />
+    <ClInclude Include="src\DrawBoard.h" />
+    <ClInclude Include="src\Mouse.h" />
+    <ClInclude Include="src\shader.h" />
+    <ClInclude Include="src\vertexbuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
