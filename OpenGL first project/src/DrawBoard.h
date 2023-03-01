@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <vector>
 #include "IndexBuffer.h"
 #include "vertexbuffer.h"
@@ -10,9 +9,10 @@ static void GLCheckErrros();
 
 class Board
 {
+private:
+	std::vector<std::vector<float>> genBoardVertexBuffer(std::vector<std::vector<int>> inputarray, unsigned int NumRows, unsigned int NumCollums);
 public:
-	Board(unsigned int RowCount, unsigned int CollumCount);
-
-	void genBoardVertexBuffer(unsigned int RowCount,unsigned int CollumCount, float OutputArray[]);
-	void genBoardIndexBuffer(std::vector<std::vector<bool>> inputBoard, void* location);
+	std::vector<unsigned int> vbs;
+	std::vector<unsigned int> ibo;
+	Board(std::vector<std::vector<int>> inputarray, unsigned int NumRows, unsigned int NumCollums);
 };
