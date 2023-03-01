@@ -28,7 +28,7 @@ Board::Board(std::vector<std::vector<int>> inputarray, unsigned int NumRows, uns
     ibo.reserve(vertexbuffers.size());
     ibo.resize(vertexbuffers.size());
     for (unsigned int i = 0; i < vertexbuffers.size(); ++i) {
-        unsigned int indcies[6] = {i,i + 1,i + 2,i,i + 1,i + 3 };
+        unsigned int indcies[6] = {0,1,2,0,1,3};
         std::vector<float>* a = &vertexbuffers[i];
 
 
