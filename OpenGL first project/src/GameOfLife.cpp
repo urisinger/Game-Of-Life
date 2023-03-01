@@ -1,16 +1,8 @@
 #include "GameOfLife.h"
 
-Game::Game(int RowCount, int CollumCount)
+Game::Game(unsigned int a)
 {
-	Board.reserve(RowCount);
-	for (int i = 0; i < RowCount; ++i)
-	{
-		Board[i].reserve(CollumCount);
-		for (int j = 0; j < CollumCount; ++j)
-		{
-			Board[i][j] = false;
-		}
-	}
+	
 }
 
 Game::~Game()
@@ -18,52 +10,93 @@ Game::~Game()
 
 }
 
-unsigned int Game :: CountNeighbors(unsigned int row, unsigned int collum)
+void Game::PrintBoard() {
+
+}
+
+bool Game::DoesTileExsist(int row, int colllum, std::vector<std::vector<int>> OldBoard)
 {
-	int counter = 0;
+	const int Boardsize = OldBoard.size();
+	int i = 0;
+	while (i < Boardsize) {
+		if (OldBoard[i][0] == row && OldBoard[i][1] == colllum) {
+			return true;
+		}
+		i++;
+	}
+
+	return false;
+}
+unsigned int Game :: CountNeighbors(int row, int collum, std::vector<std::vector<int>> OldBoard)
+{
+	unsigned int counter = 0;
 	for (int i = -1; i <= 1; ++i) {
 		for (int j = -1; j <= 1; ++j) {
-			if (Board[row + i][row + j] && (i == 0 && j == 0)) {
+			if (!(j == 0 && i == 0) && DoesTileExsist(row + i, collum + j,OldBoard)) {
 				counter++;
 			}
 		}
 	}
 	return counter;
 }
-void Game :: UpdateTile(unsigned int row, unsigned int collum)
+void Game :: AddTile(int row, int collum, std::vector<std::vector<int>> OldBoard)
 {
-	unsigned int neighbers = CountNeighbors(row, collum);
-	if (Board[row][collum] == true) {
-		if (neighbers != 2 && neighbers != 3)
-			Board[row][collum] = false;
+	const int Boardsize = OldBoard.size();
+	int i = 0;
+	while (i < Boardsize && OldBoard[i][0]<row && (i+1 < Boardsize && OldBoard[i + 1][0]<row)) {
+		i++;
 	}
-	else if (neighbers == 3) {
-		Board[row][collum] = true;
+
+	while (i < Boardsize && OldBoard[i][1] <= collum) {
+		i++;
 	}
-	//maybe write straight into memory address
+
+	OldBoard.insert(OldBoard.begin() + i, { row,collum });
 }
 
-void Game :: ChangeTile(unsigned int row, unsigned int collum)
+void Game::RemoveTile(int Row, int Collum,std::vector<std::vector<int>> OldBoard) {
+	const int Boardsize = OldBoard.size();
+	int i = 0;
+	while (i < Boardsize && OldBoard[i][0] != Row) {
+		i++;
+	}
+	if (OldBoard[i][0] == Row) {
+		while (i < Boardsize && OldBoard[i][1] != Collum && OldBoard[i][1]==Row) {
+			i++;
+		}
+
+		if (OldBoard[i][1] == Collum && OldBoard[i][1] == Row) {
+			OldBoard.erase(OldBoard.begin() + i);
+		}
+		else
+			std::cout << "tile does not exsist" << std::endl;
+	}
+	else
+		std::cout << "tile does not exsist" << std::endl;
+}
+void Game :: UpdateTile(unsigned int row, unsigned int collum,std::vector<std::vector<int>> OldBoard)
 {
-	Board[row][collum] = !Board[row][collum];
+	unsigned int Neighbors = CountNeighbors(row, collum,OldBoard);
+	std::cout << Neighbors;
+	if (DoesTileExsist(row, collum, OldBoard)) {
+		if (Neighbors != 3 && Neighbors != 2) {
+			RemoveTile(row, collum,OldBoard);
+		}
+	}
+	else if (Neighbors == 3) {
+		AddTile(row, collum,OldBoard);
+	}
 }
 
 
 void Game::UpdateBoard()
 {
-	//scale rows up by 1
-	std::vector<bool> v1(Board[0].size(),false);
-	v1.reserve(Board[0].capacity());
-	Board.insert(Board.begin(),v1);
-	Board.push_back(v1);
+	std::vector<std::vector<int>> OldBoard = Board;
 
-
-	for (int i = 0; i < Board.size();++i) {
-		//scale collums up by 1
-		Board[i].insert(Board[i].begin(), false);
-		Board[i].push_back(false);
-		for (int j = 0; j < Board[i].size(); ++j) {
-			UpdateTile(i, j);
+	for (int i = 0; i < OldBoard.size(); ++i) {
+		for (int j = 0; j <= OldBoard.size(); ++j) {
+			UpdateTile(i, j, OldBoard);
 		}
 	}
+	Board = OldBoard;
 }

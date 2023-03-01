@@ -6,7 +6,7 @@
 #include <fstream>
 
 #include "DrawBoard.h"
-
+#include "GameOfLife.h"
 #include "vertexbuffer.h"
 #include "IndexBuffer.h"
 #include "shader.h"
@@ -94,22 +94,26 @@ int main(void)
     glUseProgram(0);
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
+    
+        
     float currenttime = 0.0f;
     float prevtime = 0.0f;
     float timediff;
     unsigned int counter = 0;
     float currentfps = 0;
 
-
-    Board test(10,10);
-    float testarray[242] = {};
-    test.genBoardVertexBuffer(10,10,testarray);
-    
-    for (int i = 0; i < 2*121; i++) {
-        std::cout << i <<":" << testarray[i] << std::endl;
+    Game test(1);
+    test.Board.push_back({1,1});
+    test.Board.push_back({ 1,3 });
+    test.Board.push_back({ 4,3 });
+    for (int i = 0; i < test.Board.size(); ++i) {
+        std::cout << test.Board[i][0] << ":" << test.Board[i][1] << std::endl;
     }
+    test.UpdateBoard();
+    for (int i = 0; i < test.Board.size(); ++i) {
+        std::cout << test.Board[i][0] << ":" << test.Board[i][1] << std::endl;
+    }
+    
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -141,6 +145,7 @@ int main(void)
         //move object
         if (width + Xoffset > 1.0f)
             speed = -1.0f / currentfps;
+            
         else if (width + Xoffset < 0.0f)
             speed = 1.0f / currentfps;
 
