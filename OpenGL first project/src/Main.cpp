@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 
-//#include "DrawBoard.h"
+
 #include "GameOfLife.h"
 #include "vertexbuffer.h"
 #include "IndexBuffer.h"
@@ -17,7 +17,7 @@
 float gameX = 10;
 float gameY = 10;
 float Xoffset = -gameX/2;
-float Yoffset = -gameY / 2;
+float Yoffset = -gameY/2;
 Game test(1);
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -26,7 +26,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
         test.ChangeTile(MOUSETOTILE);
-    //    test.PrintBoard();
     }
 
 }

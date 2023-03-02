@@ -63,7 +63,7 @@ void Game::RemoveTile(int Row, int Collum) {
 
 int Game::returnminmax(unsigned int index, int minmax) {
 
-	int output = -minmax * 2147483647;
+	int output = -minmax * 2147483646;
 	if (index == 0) {
 		for (int i = 0; i < CurrentBoard.size(); i++) {
 			output = CurrentBoard[i].x * ((minmax * CurrentBoard[i].x) >= (minmax * output)) + output * ((minmax * CurrentBoard[i].x) < (minmax * output));
