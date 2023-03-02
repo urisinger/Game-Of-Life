@@ -13,22 +13,15 @@
 
 #define X_SIZE 1920
 #define Y_SIZE 1080
-#define MOUSETOTILE gameX * ((xpos / (X_SIZE))) +1 +Xoffset, -gameY * (((ypos) / (Y_SIZE))-1)+1+Yoffset
+#define MOUSETOTILE_X gameX * ((xpos / (X_SIZE))) + 1*(2*xpos>=X_SIZE) +Xoffset
+#define MOUSETOTILE_Y -gameY * (((ypos) / (Y_SIZE))-1)+1*(2*ypos<=Y_SIZE)+Yoffset
 float gameX = 10;
 float gameY = 10;
 float Xoffset = -gameX/2;
 float Yoffset = -gameY/2;
 Game test(1);
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-        test.ChangeTile(MOUSETOTILE);
-    }
 
-}
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
@@ -96,7 +89,6 @@ int main(void)
         std::cout << "error!" << std::endl;
     }
 
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetScrollCallback(window, scroll_callback);
     float pos[8];
 
@@ -142,12 +134,17 @@ int main(void)
     unsigned int counter = 0;
     float currentfps = 0;
 
+    int prevtile_X=0;
+    int prevtile_Y=0;
+
+
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
+
 
         float pos[8];
 
@@ -156,15 +153,17 @@ int main(void)
         glUniform4f(location, 1.0f, 1.0f, 1.0f, 1.0f);
 
         glBindVertexArray(vao);
+        //draw board
 
         for (int i = 0; i < test.CurrentBoard.size(); ++i) {
+            //generates data for buffer
             genBoardVertexBuffer(test.CurrentBoard[i].x, test.CurrentBoard[i].y, pos);
+            //
             vb.AddData(pos, 4 * 2 * sizeof(float));
             ib.Bind();
 
 
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-            ib.UnBind();
         }
 
 
@@ -174,13 +173,21 @@ int main(void)
         currenttime = glfwGetTime();
         timediff = currenttime - prevtime;
         counter++;
-        if (timediff >= 1 / 10.0f) {
-            //std::cout << counter / timediff << std::endl;
+        if (timediff >= 1 / 30.0f) {
             currentfps = counter / timediff;
             prevtime = currenttime;
             counter = 0;
-            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)==GLFW_PRESS) {
+            if (glfwGetKey(window, GLFW_KEY_SPACE)== GLFW_PRESS) {
                 test.UpdateBoard();
+            }
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+                double xpos, ypos;
+                glfwGetCursorPos(window, &xpos, &ypos);
+                int row = MOUSETOTILE_X, collum = MOUSETOTILE_Y;
+                if (!(prevtile_X == row && prevtile_Y == collum)) {
+                    test.ChangeTile(row, collum);
+                    prevtile_X = row, prevtile_Y = collum;
+                }
             }
             glfwSetWindowTitle(window, std::to_string(currentfps).c_str());
         }

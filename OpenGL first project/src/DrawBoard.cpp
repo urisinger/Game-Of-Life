@@ -1,4 +1,4 @@
-#include "DrawBoard.h"
+/*#include "DrawBoard.h"
 
 #include <iostream>
 
@@ -15,74 +15,36 @@ static void GLCheckErrros()
         std::cout << "[opengl error](" << error << ")" << std::endl;
     }
 }
-/*
-Board::Board(std::vector<std::vector<int>> inputarray, unsigned int NumRows, unsigned int NumCollums) {
-    glGenBuffers(inputarray.size(), &vbs);
-    glGenBuffers(inputarray.size(), &ibo);
-    
-    for (unsigned int i = 0; i < inputarray.size(); ++i) {
-        float vertecies[8];
-        unsigned int indcies[6] = {0,1,2,0,1,3};
+
+Board::Board(std::vector<cell> inputarray) {
+
+}
 
 
-        genBoardVertexBuffer(inputarray[i][0],inputarray[i][1],NumRows, NumCollums, vertecies);
-        
+void Board::draw(std::vector<cell> inputarray)
+{
+    float pos[8];
+    for (int i = 0; i < inputarray.size(); ++i) {
+
+        genBoardVertexBuffer(inputarray[i].x, inputarray[i].y, pos);
+        vb.AddData(pos, 4 * 2 * sizeof(float));
+        ib.Bind();
 
 
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbs[i]);
-        glBufferData(GL_ARRAY_BUFFER, 8*sizeof(float), vertecies, GL_STATIC_DRAW);
-
-
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, &ibo[i]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indcies, GL_STATIC_DRAW);
-
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT,0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        ib.UnBind();
     }
 }
-*/
-/*
-void Board::DrawBoard(std::vector<std::vector<int>> inputarray, unsigned int NumRows, unsigned int NumCollums)
+
+
+void Board::genBoardVertexBuffer(int Row, int Collum,  float OutputArray[8])
 {
-    float* vertexbuffers = new float[inputarray.size()*8];
-    unsigned int* indexbuffers = new unsigned int[inputarray.size()];
-
-    genBoardVertexBuffer(inputarray, NumRows, NumCollums,vertexbuffers);
-
-
-    
-    for (unsigned int i = 0; i < inputarray.size(); ++i) {
-        unsigned int indcies[6] = { 0,1,2,0,1,3 };
-
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbs);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * sizeof(float), vertex);
-
-        glDeleteBuffers(1, &ibo);
-        glGenBuffers(1, &ibo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indcies,GL_STATIC_DRAW);
-
-
-        glDrawArrays(GL_TRIANGLES, 6, GL_UNSIGNED_INT);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    }
-}
-*/
-
-void Board::genBoardVertexBuffer(int Row,int Collum,unsigned int NumRows,unsigned int NumCollums, float OutputArray[8])
-{
-        OutputArray[0]=(static_cast<float>(Row) / (NumCollums));
-        OutputArray[1]=(static_cast<float>(Collum+1) / (NumRows));
-        OutputArray[2]=(static_cast<float>(Row + 1) / (NumCollums));
-        OutputArray[3]=(static_cast<float>(Collum) / (NumRows));
-        OutputArray[4]=(static_cast<float>(Row + 1) / (NumCollums));
-        OutputArray[5]=(static_cast<float>(Collum+ 1) / (NumRows));
-        OutputArray[6]=(static_cast<float>(Row) / (NumCollums));
-        OutputArray[7]=(static_cast<float>(Collum) / (NumRows));
-}
+    OutputArray[0] = 2 * (static_cast<float>(Row - Xoffset) / (gameX)) - 1;
+    OutputArray[1] = 2 * (static_cast<float>(Collum - 1 - Yoffset) / (gameY)) - 1;
+    OutputArray[2] = 2 * (static_cast<float>(Row - 1 - Xoffset) / (gameX)) - 1;
+    OutputArray[3] = 2 * (static_cast<float>(Collum - Yoffset) / (gameY)) - 1;
+    OutputArray[4] = 2 * (static_cast<float>(Row - 1 - Xoffset) / (gameX)) - 1;
+    OutputArray[5] = 2 * (static_cast<float>(Collum - 1 - Yoffset) / (gameY)) - 1;
+    OutputArray[6] = 2 * (static_cast<float>(Row - Xoffset) / (gameX)) - 1;
+    OutputArray[7] = 2 * (static_cast<float>(Collum - Yoffset) / (gameY)) - 1;
+}*/
