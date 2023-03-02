@@ -149,7 +149,7 @@ int main(void)
         glBindVertexArray(vao);
 
         for (int i = 0; i < test.Board.size(); ++i) {
-            genBoardVertexBuffer(test.Board[i][0], test.Board[i][1], 100.0f, 100.0f, pos);
+            genBoardVertexBuffer(test.Board[i][0], test.Board[i][1], 50.0f, 50.0f, pos);
             vb.AddData(pos, 4 * 2 * sizeof(float));
             ib.Bind();
 
