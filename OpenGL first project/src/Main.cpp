@@ -13,7 +13,9 @@
 
 #define X_SIZE 1920
 #define Y_SIZE 1080
-
+#define MOUSETOTILE gameX*(((2*xpos) / (X_SIZE))-1)-1*((2 * xpos > X_SIZE) * 2 - 1), -gameY*(((2*ypos)/(Y_SIZE))-1)-1*((2*ypos>Y_SIZE)*2-1)
+float gameX = 100;
+float gameY = 100;
 Game test(1);
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -21,11 +23,13 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        std::cout << xpos / X_SIZE <<":"<< ypos / Y_SIZE << std::endl;
-        test.AddTile(25*((2*xpos) / (X_SIZE)-1)+1, -25*((2*ypos)/(Y_SIZE)-1)+1, test.Board);
+        test.ChangeTile(MOUSETOTILE);
+    //    test.PrintBoard();
     }
 
 }
+
+
 static void GLclearerrors()
 {
     while (glGetError());
@@ -41,16 +45,16 @@ static void GLCheckErrros()
 
 
 
-void genBoardVertexBuffer(int Row, int Collum, float NumRows, float NumCollums, float OutputArray[8])
+void genBoardVertexBuffer(int Row, int Collum, float OutputArray[8])
 {
-    OutputArray[0] = (static_cast<float>(Row) / (NumCollums));
-    OutputArray[1] = (static_cast<float>(Collum - 1) / (NumRows));
-    OutputArray[2] = (static_cast<float>(Row - 1) / (NumCollums));
-    OutputArray[3] = (static_cast<float>(Collum) / (NumRows));
-    OutputArray[4] = (static_cast<float>(Row - 1) / (NumCollums));
-    OutputArray[5] = (static_cast<float>(Collum -1) / (NumRows));
-    OutputArray[6] = (static_cast<float>(Row) / (NumCollums));
-    OutputArray[7] = (static_cast<float>(Collum) / (NumRows));
+    OutputArray[0] = (static_cast<float>(Row) / (gameX));
+    OutputArray[1] = (static_cast<float>(Collum - 1) / (gameY));
+    OutputArray[2] = (static_cast<float>(Row - 1) / (gameX));
+    OutputArray[3] = (static_cast<float>(Collum) / (gameY));
+    OutputArray[4] = (static_cast<float>(Row - 1) / (gameX));
+    OutputArray[5] = (static_cast<float>(Collum -1) / (gameY));
+    OutputArray[6] = (static_cast<float>(Row) / (gameX));
+    OutputArray[7] = (static_cast<float>(Collum) / (gameY));
 }
 
 
@@ -77,7 +81,7 @@ int main(void)
     /* Make the window's context current */ 
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     if (glewInit() != GLEW_OK) {
         std::cout << "error!" << std::endl;
@@ -132,7 +136,6 @@ int main(void)
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -140,12 +143,12 @@ int main(void)
 
         glUseProgram(shader);
 
-        glUniform4f(location, 0.8f, 0.3f, 0.02f, 1.0f);
+        glUniform4f(location, 1.0f, 1.0f, 1.0f, 1.0f);
 
         glBindVertexArray(vao);
 
         for (int i = 0; i < test.Board.size(); ++i) {
-            genBoardVertexBuffer(test.Board[i][0], test.Board[i][1], 25.0f, 25.0f, pos);
+            genBoardVertexBuffer(test.Board[i][0], test.Board[i][1], pos);
             vb.AddData(pos, 4 * 2 * sizeof(float));
             ib.Bind();
 
@@ -161,7 +164,7 @@ int main(void)
         currenttime = glfwGetTime();
         timediff = currenttime - prevtime;
         counter++;
-        if (timediff >= 1 / 30.0f) {
+        if (timediff >= 1 / 3.0f) {
             //std::cout << counter / timediff << std::endl;
             currentfps = counter / timediff;
             prevtime = currenttime;
@@ -169,6 +172,7 @@ int main(void)
             if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)==GLFW_PRESS) {
                 test.UpdateBoard();
             }
+            std::cout << currentfps << std::endl;
         }
 
         /* Swap front and back buffers */

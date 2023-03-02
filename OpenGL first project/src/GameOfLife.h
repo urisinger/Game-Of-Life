@@ -15,6 +15,7 @@ public:
 	Game(unsigned int a);
 	~Game();
 
+	void ChangeTile(int Row, int Collum);
 	void AddTile(int Row, int Collum, std::vector<std::vector<int>> OldBoard);
 	void RemoveTile(int Row, int Collum, std::vector<std::vector<int>> OldBoard);
 

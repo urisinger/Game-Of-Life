@@ -105,3 +105,12 @@ void Game::UpdateBoard()
 		}
 	}
 }
+
+void Game::ChangeTile(int Row,int Collum) {
+	if (DoesTileExsist(Row, Collum,Board)) {
+		RemoveTile(Row, Collum, Board);
+	}
+	else {
+		AddTile(Row, Collum, Board);
+	}
+}
