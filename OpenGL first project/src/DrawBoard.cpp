@@ -15,31 +15,57 @@ static void GLCheckErrros()
         std::cout << "[opengl error](" << error << ")" << std::endl;
     }
 }
-
+/*
 Board::Board(std::vector<std::vector<int>> inputarray, unsigned int NumRows, unsigned int NumCollums) {
-    std::vector<std::vector<float>> vertexbuffers;
+    glGenBuffers(inputarray.size(), &vbs);
+    glGenBuffers(inputarray.size(), &ibo);
+    
+    for (unsigned int i = 0; i < inputarray.size(); ++i) {
+        float vertecies[8];
+        unsigned int indcies[6] = {0,1,2,0,1,3};
+
+
+        genBoardVertexBuffer(inputarray[i][0],inputarray[i][1],NumRows, NumCollums, vertecies);
+        
+
+
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbs[i]);
+        glBufferData(GL_ARRAY_BUFFER, 8*sizeof(float), vertecies, GL_STATIC_DRAW);
+
+
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, &ibo[i]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indcies, GL_STATIC_DRAW);
+
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT,0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+}
+*/
+/*
+void Board::DrawBoard(std::vector<std::vector<int>> inputarray, unsigned int NumRows, unsigned int NumCollums)
+{
+    float* vertexbuffers = new float[inputarray.size()*8];
     unsigned int* indexbuffers = new unsigned int[inputarray.size()];
 
-    vertexbuffers = genBoardVertexBuffer(inputarray, NumRows, NumCollums);
+    genBoardVertexBuffer(inputarray, NumRows, NumCollums,vertexbuffers);
 
 
-    vbs.reserve(vertexbuffers.size());
-    vbs.resize(vertexbuffers.size());
-    ibo.reserve(vertexbuffers.size());
-    ibo.resize(vertexbuffers.size());
-    for (unsigned int i = 0; i < vertexbuffers.size(); ++i) {
-        unsigned int indcies[6] = {0,1,2,0,1,3};
-        std::vector<float>* a = &vertexbuffers[i];
+    
+    for (unsigned int i = 0; i < inputarray.size(); ++i) {
+        unsigned int indcies[6] = { 0,1,2,0,1,3 };
 
 
-        glGenBuffers(1, &vbs[i]);
-        glBindBuffer(GL_ARRAY_BUFFER, vbs[i]);
-        glBufferData(GL_ARRAY_BUFFER, 8*sizeof(float), a, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, vbs);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * sizeof(float), vertex);
 
-
-        glGenBuffers(0, &ibo[i]);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[i]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indcies, GL_STATIC_DRAW);
+        glDeleteBuffers(1, &ibo);
+        glGenBuffers(1, &ibo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indcies,GL_STATIC_DRAW);
 
 
         glDrawArrays(GL_TRIANGLES, 6, GL_UNSIGNED_INT);
@@ -47,23 +73,16 @@ Board::Board(std::vector<std::vector<int>> inputarray, unsigned int NumRows, uns
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 }
+*/
 
-
-
-std::vector<std::vector<float>> Board::genBoardVertexBuffer(std::vector<std::vector<int>> inputarray,unsigned int NumRows,unsigned int NumCollums)
+void Board::genBoardVertexBuffer(int Row,int Collum,unsigned int NumRows,unsigned int NumCollums, float OutputArray[8])
 {
-    std::vector<std::vector<float>> OutputArray;
-    for (int i = 0; i < inputarray.size(); ++i) {
-        std::vector<float> v1;
-        OutputArray.push_back(v1);
-        OutputArray[i].push_back(static_cast<float>(inputarray[i][0]) / (NumCollums));
-        OutputArray[i].push_back(static_cast<float>(inputarray[i][1]+1) / (NumRows));
-        OutputArray[i].push_back(static_cast<float>(inputarray[i][0] + 1) / (NumCollums));
-        OutputArray[i].push_back(static_cast<float>(inputarray[i][1]) / (NumRows));
-        OutputArray[i].push_back(static_cast<float>(inputarray[i][0] + 1) / (NumCollums));
-        OutputArray[i].push_back(static_cast<float>(inputarray[i][1] + 1) / (NumRows));
-        OutputArray[i].push_back(static_cast<float>(inputarray[i][0]) / (NumCollums));
-        OutputArray[i].push_back(static_cast<float>(inputarray[i][1]) / (NumRows));
-    }
-    return OutputArray;
+        OutputArray[0]=(static_cast<float>(Row) / (NumCollums));
+        OutputArray[1]=(static_cast<float>(Collum+1) / (NumRows));
+        OutputArray[2]=(static_cast<float>(Row + 1) / (NumCollums));
+        OutputArray[3]=(static_cast<float>(Collum) / (NumRows));
+        OutputArray[4]=(static_cast<float>(Row + 1) / (NumCollums));
+        OutputArray[5]=(static_cast<float>(Collum+ 1) / (NumRows));
+        OutputArray[6]=(static_cast<float>(Row) / (NumCollums));
+        OutputArray[7]=(static_cast<float>(Collum) / (NumRows));
 }
