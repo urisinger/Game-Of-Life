@@ -24,7 +24,7 @@ static void GLCheckErrros()
     }
 }
 
-void genBoardVertexBuffer(int Row, int Collum, unsigned int NumRows, unsigned int NumCollums, float OutputArray[8])
+void genBoardVertexBuffer(int Row, int Collum, float NumRows, float NumCollums, float OutputArray[8])
 {
     OutputArray[0] = (static_cast<float>(Row) / (NumCollums));
     OutputArray[1] = (static_cast<float>(Collum + 1) / (NumRows));
@@ -50,7 +50,7 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1920, 1080, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(1920, 1080, "Game of life", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -127,16 +127,11 @@ int main(void)
     float currentfps = 0;
 
     Game test(1);
+    test.Board.push_back({ -1,0 });
+    test.Board.push_back({ 0,1 });
+    test.Board.push_back({ 1,-1 });
+    test.Board.push_back({ 1,0 });
     test.Board.push_back({ 1,1 });
-    test.Board.push_back({ 1,3 });
-    test.Board.push_back({ 4,3 });
-    for (int i = 0; i < test.Board.size(); ++i) {
-        std::cout << test.Board[i][0] << ":" << test.Board[i][1] << std::endl;
-    }
-    test.UpdateBoard();
-    for (int i = 0; i < test.Board.size(); ++i) {
-        std::cout << test.Board[i][0] << ":" << test.Board[i][1] << std::endl;
-    }
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -145,14 +140,7 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        Xoffset = 0.0f;
-        Yoffset = 0.0f;
-        float pos[8] = {
-           -width + Xoffset,-height + Yoffset,
-            width + Xoffset,height + Yoffset,
-           -width + Xoffset,height + Yoffset,
-            width + Xoffset,-height + Yoffset,
-        };
+        float pos[8];
 
         glUseProgram(shader);
 
@@ -160,24 +148,18 @@ int main(void)
 
         glBindVertexArray(vao);
 
-        vb.AddData(pos, 4 * 2 * sizeof(float));
-        ib.Bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-        ib.UnBind();
-        Xoffset = 0.3f;
-        Yoffset = 0.1f;
-        float pos2[8] = {
-   -width + Xoffset,-height + Yoffset,
-    width + Xoffset,height + Yoffset,
-   -width + Xoffset,height + Yoffset,
-    width + Xoffset,-height + Yoffset,
-        };
-        vb.AddData(pos2, 4 * 2 * sizeof(float));
-        ib.Bind();
+        for (int i = 0; i < test.Board.size(); ++i) {
+            genBoardVertexBuffer(test.Board[i][0], test.Board[i][1], 100.0f, 100.0f, pos);
+            vb.AddData(pos, 4 * 2 * sizeof(float));
+            ib.Bind();
 
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT,nullptr);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+            ib.UnBind();
+        }
+
+
+
 
         //fps
         currenttime = glfwGetTime();
@@ -188,6 +170,7 @@ int main(void)
             currentfps = counter / timediff;
             prevtime = currenttime;
             counter = 0;
+            test.UpdateBoard();
         }
 
         /* Swap front and back buffers */
