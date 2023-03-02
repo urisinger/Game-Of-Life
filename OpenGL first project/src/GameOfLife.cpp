@@ -1,14 +1,11 @@
 #include "GameOfLife.h"
 
+
 Game::Game(unsigned int a)
 {
 	
 }
 
-Game::~Game()
-{
-
-}
 
 void Game::PrintBoard() {
 
@@ -19,18 +16,18 @@ void Game::PrintBoard() {
 
 	for (int i = MinRows; i <= MaxRows; ++i) {
 		for (int j = MinCollums; j <= MaxCollums; ++j) {
-			std::cout << DoesTileExsist(i, j, Board)<<"|";
+			std::cout << DoesTileExsist(i, j)<<"|";
 		}
 		std::cout << std::endl;
 	}
 }
 
-bool Game::DoesTileExsist(int row, int colllum, std::vector<std::vector<int>> OldBoard)
+bool Game::DoesTileExsist(int row, int colllum)
 {
-	const int Boardsize = OldBoard.size();
+	const int Boardsize = CurrentBoard.size();
 	int i = 0;
 	while (i < Boardsize) {
-		if (OldBoard[i][0] == row && OldBoard[i][1] == colllum) {
+		if (CurrentBoard[i].x == row && CurrentBoard[i].y == colllum) {
 			return true;
 		}
 		i++;
@@ -38,53 +35,45 @@ bool Game::DoesTileExsist(int row, int colllum, std::vector<std::vector<int>> Ol
 
 	return false;
 }
-unsigned int Game :: CountNeighbors(int row, int collum, std::vector<std::vector<int>> OldBoard)
+unsigned int Game :: CountNeighbors(int row, int collum)
 {
 	unsigned int counter = 0;
 	for (int i = -1; i <= 1; ++i) {
 		for (int j = -1; j <= 1; ++j) {
-			if (!(j == 0 && i == 0) && DoesTileExsist(row + i, collum + j,OldBoard)) {
-				counter++;
+			if (!(j == 0 && i == 0)) {
+				counter += DoesTileExsist(row + i, collum + j);
 			}
 		}
 	}
 	return counter;
 }
-void Game :: AddTile(int row, int collum, std::vector<std::vector<int>> OldBoard)
-{
-	Board.push_back({row,collum});
-}
 
-void Game::RemoveTile(int Row, int Collum, std::vector<std::vector<int>> OldBoard) {
-	const int Boardsize = Board.size();
+void Game::RemoveTile(int Row, int Collum) {
+	const int Boardsize = NextBoard.size();
 	int i = 0;
-	while (i <= Boardsize) {
-		if (Board[i][0] == Row && Board[i][1] == Collum) {
-			Board.erase(Board.begin() + i);
+	while (i < Boardsize) {
+		if (NextBoard[i].x == Row && NextBoard[i].y == Collum) {
+			NextBoard.erase(NextBoard.begin() + i);
 			return;
 		}
 		i++;
 	}
 	std::cout << "no was found";
 }
-void Game :: UpdateTile(int row,int collum,std::vector<std::vector<int>> OldBoard)
-{
-	unsigned int Neighbors = CountNeighbors(row, collum,OldBoard);
-	if (DoesTileExsist(row, collum, OldBoard)) {
-		if (Neighbors != 3 && Neighbors != 2) {
-			RemoveTile(row, collum,OldBoard);
-		}
-	}
-	else if (Neighbors == 3) {
-		AddTile(row, collum,OldBoard);
-	}
-}
 
 int Game::returnminmax(unsigned int index, int minmax) {
 
 	int output = -minmax * 2147483647;
-	for (int i = 0; i < Board.size(); i++) {
-		output = Board[i][index] * ((minmax * Board[i][index]) >=( minmax * output)) + output * ((minmax * Board[i][index]) < (minmax * output));
+	if (index == 0) {
+		for (int i = 0; i < CurrentBoard.size(); i++) {
+			output = CurrentBoard[i].x * ((minmax * CurrentBoard[i].x) >= (minmax * output)) + output * ((minmax * CurrentBoard[i].x) < (minmax * output));
+		}
+	}
+	else
+	{
+		for (int i = 0; i < CurrentBoard.size(); i++) {
+			output = CurrentBoard[i].y * ((minmax * CurrentBoard[i].y) >= (minmax * output)) + output * ((minmax * CurrentBoard[i].y) < (minmax * output));
+		}
 	}
 	return output;
 }
@@ -97,20 +86,38 @@ void Game::UpdateBoard()
 	int MinRows = returnminmax(0, -1);
 	int MaxCollums = returnminmax(1, 1);
 	int MinCollums = returnminmax(1, -1);
-	std::vector<std::vector<int>> OldBoard = Board;
+
+	NextBoard = CurrentBoard;
 
 	for (int i = MinRows-1; i <= MaxRows+1; ++i) {
 		for (int j = MinCollums -1; j <= MaxCollums+1; ++j) {
-			UpdateTile(i, j, OldBoard);
+			unsigned int Neighbors = CountNeighbors(i, j);
+			if (DoesTileExsist(i, j)) {
+				if (Neighbors != 3 && Neighbors != 2) {
+					RemoveTile(i, j);
+				}
+			}
+			else if (Neighbors == 3) {
+				NextBoard.emplace_back(i, j);
+			}
 		}
 	}
+	CurrentBoard = NextBoard;
 }
 
 void Game::ChangeTile(int Row,int Collum) {
-	if (DoesTileExsist(Row, Collum,Board)) {
-		RemoveTile(Row, Collum, Board);
+	if (DoesTileExsist(Row, Collum)) {
+		const int Boardsize = CurrentBoard.size();
+		int i = 0;
+		while (i < Boardsize) {
+			if (CurrentBoard[i].x == Row && CurrentBoard[i].y == Collum) {
+				CurrentBoard.erase(CurrentBoard.begin() + i);
+				return;
+			}
+			i++;
+		}
 	}
 	else {
-		AddTile(Row, Collum, Board);
+		CurrentBoard.emplace_back(Row, Collum);
 	}
 }

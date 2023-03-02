@@ -13,9 +13,11 @@
 
 #define X_SIZE 1920
 #define Y_SIZE 1080
-#define MOUSETOTILE gameX*(((2*xpos) / (X_SIZE))-1)-1*((2 * xpos > X_SIZE) * 2 - 1), -gameY*(((2*ypos)/(Y_SIZE))-1)-1*((2*ypos>Y_SIZE)*2-1)
-float gameX = 100;
-float gameY = 100;
+#define MOUSETOTILE gameX * ((xpos / (X_SIZE))) +1 +Xoffset, -gameY * (((ypos) / (Y_SIZE))-1)+1+Yoffset
+float gameX = 10;
+float gameY = 10;
+float Xoffset = -gameX/2;
+float Yoffset = -gameY / 2;
 Game test(1);
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -27,6 +29,14 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     //    test.PrintBoard();
     }
 
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    gameX += yoffset;
+    gameY += yoffset;
+    Xoffset = -gameX / 2;
+    Yoffset = -gameY / 2;
 }
 
 
@@ -47,14 +57,14 @@ static void GLCheckErrros()
 
 void genBoardVertexBuffer(int Row, int Collum, float OutputArray[8])
 {
-    OutputArray[0] = (static_cast<float>(Row) / (gameX));
-    OutputArray[1] = (static_cast<float>(Collum - 1) / (gameY));
-    OutputArray[2] = (static_cast<float>(Row - 1) / (gameX));
-    OutputArray[3] = (static_cast<float>(Collum) / (gameY));
-    OutputArray[4] = (static_cast<float>(Row - 1) / (gameX));
-    OutputArray[5] = (static_cast<float>(Collum -1) / (gameY));
-    OutputArray[6] = (static_cast<float>(Row) / (gameX));
-    OutputArray[7] = (static_cast<float>(Collum) / (gameY));
+    OutputArray[0] = 2*(static_cast<float>(Row-Xoffset) / (gameX))-1;
+    OutputArray[1] = 2*(static_cast<float>(Collum - 1-Yoffset) / (gameY))-1;
+    OutputArray[2] = 2*(static_cast<float>(Row - 1- Xoffset) / (gameX))-1;
+    OutputArray[3] = 2*(static_cast<float>(Collum- Yoffset) / (gameY))-1;
+    OutputArray[4] = 2*(static_cast<float>(Row - 1- Xoffset) / (gameX))-1;
+    OutputArray[5] = 2*(static_cast<float>(Collum -1- Yoffset) / (gameY))-1;
+    OutputArray[6] = 2*(static_cast<float>(Row- Xoffset) / (gameX))-1;
+    OutputArray[7] = 2*(static_cast<float>(Collum- Yoffset) / (gameY))-1;
 }
 
 
@@ -81,13 +91,14 @@ int main(void)
     /* Make the window's context current */ 
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     if (glewInit() != GLEW_OK) {
         std::cout << "error!" << std::endl;
     }
 
     glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetScrollCallback(window, scroll_callback);
     float pos[8];
 
     unsigned int indexs[6] =
@@ -147,8 +158,8 @@ int main(void)
 
         glBindVertexArray(vao);
 
-        for (int i = 0; i < test.Board.size(); ++i) {
-            genBoardVertexBuffer(test.Board[i][0], test.Board[i][1], pos);
+        for (int i = 0; i < test.CurrentBoard.size(); ++i) {
+            genBoardVertexBuffer(test.CurrentBoard[i].x, test.CurrentBoard[i].y, pos);
             vb.AddData(pos, 4 * 2 * sizeof(float));
             ib.Bind();
 
@@ -164,7 +175,7 @@ int main(void)
         currenttime = glfwGetTime();
         timediff = currenttime - prevtime;
         counter++;
-        if (timediff >= 1 / 3.0f) {
+        if (timediff >= 1 / 10.0f) {
             //std::cout << counter / timediff << std::endl;
             currentfps = counter / timediff;
             prevtime = currenttime;
@@ -172,7 +183,7 @@ int main(void)
             if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)==GLFW_PRESS) {
                 test.UpdateBoard();
             }
-            std::cout << currentfps << std::endl;
+            glfwSetWindowTitle(window, std::to_string(currentfps).c_str());
         }
 
         /* Swap front and back buffers */

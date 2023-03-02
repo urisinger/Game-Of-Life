@@ -1,23 +1,33 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
-#include <math.h>
+
+
+struct cell
+{
+	int x;
+	int y;
+	cell(int Row, double Collum) {
+		x = Row;
+		y = Collum;
+	}
+
+};
 
 class Game
 {
 private:
-	unsigned int CountNeighbors(int row, int collum, std::vector<std::vector<int>> OldBoard);
-	void UpdateTile(int row, int collum, std::vector<std::vector<int>> OldBoard);
-	bool DoesTileExsist(int row, int colllum, std::vector<std::vector<int>> OldBoard);
+	unsigned int CountNeighbors(int row, int collum);
+	bool DoesTileExsist(int row, int colllum);
 	int returnminmax(unsigned int index,int minmax);
 public:
-	std::vector < std ::vector<int>> Board;
+	std::vector<cell> CurrentBoard;
+	std::vector<cell> NextBoard;
 	Game(unsigned int a);
-	~Game();
 
 	void ChangeTile(int Row, int Collum);
-	void AddTile(int Row, int Collum, std::vector<std::vector<int>> OldBoard);
-	void RemoveTile(int Row, int Collum, std::vector<std::vector<int>> OldBoard);
+	void AddTile(int Row, int Collum);
+	void RemoveTile(int Row, int Collum);
 
 	void UpdateBoard();
 
