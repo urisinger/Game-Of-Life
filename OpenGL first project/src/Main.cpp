@@ -11,6 +11,21 @@
 #include "IndexBuffer.h"
 #include "shader.h"
 
+#define X_SIZE 1920
+#define Y_SIZE 1080
+
+Game test(1);
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        std::cout << xpos / X_SIZE <<":"<< ypos / Y_SIZE << std::endl;
+        test.AddTile(25*((2*xpos) / (X_SIZE)-1)+1, -25*((2*ypos)/(Y_SIZE)-1)+1, test.Board);
+    }
+
+}
 static void GLclearerrors()
 {
     while (glGetError());
@@ -24,14 +39,16 @@ static void GLCheckErrros()
     }
 }
 
+
+
 void genBoardVertexBuffer(int Row, int Collum, float NumRows, float NumCollums, float OutputArray[8])
 {
     OutputArray[0] = (static_cast<float>(Row) / (NumCollums));
-    OutputArray[1] = (static_cast<float>(Collum + 1) / (NumRows));
-    OutputArray[2] = (static_cast<float>(Row + 1) / (NumCollums));
+    OutputArray[1] = (static_cast<float>(Collum - 1) / (NumRows));
+    OutputArray[2] = (static_cast<float>(Row - 1) / (NumCollums));
     OutputArray[3] = (static_cast<float>(Collum) / (NumRows));
-    OutputArray[4] = (static_cast<float>(Row + 1) / (NumCollums));
-    OutputArray[5] = (static_cast<float>(Collum + 1) / (NumRows));
+    OutputArray[4] = (static_cast<float>(Row - 1) / (NumCollums));
+    OutputArray[5] = (static_cast<float>(Collum -1) / (NumRows));
     OutputArray[6] = (static_cast<float>(Row) / (NumCollums));
     OutputArray[7] = (static_cast<float>(Collum) / (NumRows));
 }
@@ -50,14 +67,14 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1920, 1080, "Game of life", NULL, NULL);
+    window = glfwCreateWindow(X_SIZE, Y_SIZE, "Game of life", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
         return -1;
     }
 
-    /* Make the window's context current */
+    /* Make the window's context current */ 
     glfwMakeContextCurrent(window);
 
     glfwSwapInterval(1);
@@ -66,22 +83,8 @@ int main(void)
         std::cout << "error!" << std::endl;
     }
 
-    float width = 0.5f;
-    float height = 0.1f;
-    float Xoffset = 0.0f;
-    float Yoffset = 0.0f;
-
-    float speed = 1.0f / 60.0f;
-
-
-    float pos[8] =
-    {
-       -width + Xoffset,-height + Yoffset,
-        width + Yoffset,height + Yoffset,
-       -width + Xoffset,height + Yoffset,
-        width + Xoffset,-height + Yoffset,
-
-    };
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    float pos[8];
 
     unsigned int indexs[6] =
     {
@@ -109,7 +112,6 @@ int main(void)
 
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
     //create and save index buffer on gpu
     IndexBuffer ib(indexs, 6, 1);
@@ -126,12 +128,6 @@ int main(void)
     unsigned int counter = 0;
     float currentfps = 0;
 
-    Game test(1);
-    test.Board.push_back({ -1,0 });
-    test.Board.push_back({ 0,1 });
-    test.Board.push_back({ 1,-1 });
-    test.Board.push_back({ 1,0 });
-    test.Board.push_back({ 1,1 });
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -149,7 +145,7 @@ int main(void)
         glBindVertexArray(vao);
 
         for (int i = 0; i < test.Board.size(); ++i) {
-            genBoardVertexBuffer(test.Board[i][0], test.Board[i][1], 50.0f, 50.0f, pos);
+            genBoardVertexBuffer(test.Board[i][0], test.Board[i][1], 25.0f, 25.0f, pos);
             vb.AddData(pos, 4 * 2 * sizeof(float));
             ib.Bind();
 
@@ -170,7 +166,9 @@ int main(void)
             currentfps = counter / timediff;
             prevtime = currenttime;
             counter = 0;
-            test.UpdateBoard();
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)==GLFW_PRESS) {
+                test.UpdateBoard();
+            }
         }
 
         /* Swap front and back buffers */
