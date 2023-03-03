@@ -1,35 +1,26 @@
+#pragma once
+
 #include <vector>
 #include <iostream>
-#include <algorithm>
-
-
-struct cell
-{
-	int x;
-	int y;
-	cell(int Row, double Collum) {
-		x = Row;
-		y = Collum;
-	}
-
+struct Point {
+    int x, y;
+    Point(int a, int b) : x(a), y(b) {}
 };
-
-class Game
-{
-private:
-	unsigned int CountNeighbors(int row, int collum);
-	bool DoesTileExsist(int row, int colllum);
-	int returnminmax(unsigned int index,int minmax);
+class Game {
 public:
-	std::vector<cell> CurrentBoard;
-	std::vector<cell> NextBoard;
-	Game(unsigned int a);
+    Game(unsigned int s);
 
-	void ChangeTile(int Row, int Collum);
-	void AddTile(int Row, int Collum);
-	void RemoveTile(int Row, int Collum);
+    void PrintBoard();
+    void UpdateBoard();
+    void ChangeTile(int row, int col);
 
-	void UpdateBoard();
+    std::vector<Point> currentBoard;
+    std::vector<Point> nextBoard;
 
-	void PrintBoard();
+private:
+
+    bool DoesTileExist(int row, int col) const;
+    void RemoveTile(int row, int col);
+    unsigned int CountNeighbors(int row, int col) const;
+    int GetMinMax(unsigned int index, int minmax) const;
 };

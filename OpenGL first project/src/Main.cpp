@@ -15,8 +15,8 @@
 #define Y_SIZE 1080
 #define MOUSETOTILE_X gameX * ((xpos / (X_SIZE))) + 1*(2*xpos>=X_SIZE) +Xoffset
 #define MOUSETOTILE_Y -gameY * (((ypos) / (Y_SIZE))-1)+1*(2*ypos<=Y_SIZE)+Yoffset
-float gameX = 10;
-float gameY = 10;
+float gameX = 25;
+float gameY = 25;
 float Xoffset = -gameX/2;
 float Yoffset = -gameY/2;
 Game test(1);
@@ -83,7 +83,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     if (glewInit() != GLEW_OK) {
         std::cout << "error!" << std::endl;
@@ -155,9 +155,9 @@ int main(void)
         glBindVertexArray(vao);
         //draw board
 
-        for (int i = 0; i < test.CurrentBoard.size(); ++i) {
+        for (int i = 0; i < test.currentBoard.size(); ++i) {
             //generates data for buffer
-            genBoardVertexBuffer(test.CurrentBoard[i].x, test.CurrentBoard[i].y, pos);
+            genBoardVertexBuffer(test.currentBoard[i].x, test.currentBoard[i].y, pos);
             //
             vb.AddData(pos, 4 * 2 * sizeof(float));
             ib.Bind();
@@ -185,7 +185,7 @@ int main(void)
 
         }
 
-        //
+        //mouse calls
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
         int row = MOUSETOTILE_X, collum = MOUSETOTILE_Y;
@@ -196,8 +196,16 @@ int main(void)
             }
         }
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-            Xoffset += (prevtile_X - row) / 60;
-            Yoffset += (prevtile_Y - collum) / 60;
+            //upper limit
+            float mousespeedX = 10 * (prevtile_X - row) / currentfps > gameX/currentfps ? gameX / currentfps : 10 * (prevtile_X - row) / currentfps;
+            float mousespeedY = 10 * (prevtile_Y - collum) / currentfps > gameX / currentfps ? gameX / currentfps : 10 * (prevtile_Y - collum) / currentfps;
+
+            //lower limit 
+            mousespeedX = mousespeedX < -gameX / currentfps ? -gameX / currentfps : mousespeedX;
+            mousespeedY = mousespeedY < -gameX / currentfps ? -gameX / currentfps : mousespeedY;
+
+            Xoffset += mousespeedX;
+            Yoffset += mousespeedY;
         }
 
 
@@ -207,7 +215,7 @@ int main(void)
             /* Poll for and process events */
             glfwPollEvents();
         }
-
+    glDeleteProgram(shader);
         glfwTerminate();
         return 0;
     }

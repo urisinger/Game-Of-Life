@@ -1,123 +1,118 @@
 #include "GameOfLife.h"
 
-
 Game::Game(unsigned int a)
 {
-	
-}
 
+}
 
 void Game::PrintBoard() {
 
-	int MaxRows = returnminmax(0, 1);
-	int MinRows = returnminmax(0, -1);
-	int MaxCollums = returnminmax(1, 1);
-	int MinCollums = returnminmax(1, -1);
+	int maxRow = GetMinMax(0, 1);
+	int minRow = GetMinMax(0, -1);
+	int maxCol = GetMinMax(1, 1);
+	int minCol = GetMinMax(1, -1);
 
-	for (int i = MinRows; i <= MaxRows; ++i) {
-		for (int j = MinCollums; j <= MaxCollums; ++j) {
-			std::cout << DoesTileExsist(i, j)<<"|";
+	for (int i = minRow; i <= maxRow; ++i) {
+		for (int j = minCol; j <= maxCol; ++j) {
+			std::cout << DoesTileExist(i, j) << "|";
 		}
 		std::cout << std::endl;
 	}
 }
 
-bool Game::DoesTileExsist(int row, int colllum)
+bool Game::DoesTileExist(int row, int col) const
 {
-	const int Boardsize = CurrentBoard.size();
+	const int boardSize = currentBoard.size();
 	int i = 0;
-	while (i < Boardsize) {
-		if (CurrentBoard[i].x == row && CurrentBoard[i].y == colllum) {
+	while (i < boardSize) {
+		if (currentBoard[i].x == row && currentBoard[i].y == col) {
 			return true;
 		}
 		i++;
 	}
-
 	return false;
 }
-unsigned int Game :: CountNeighbors(int row, int collum)
+
+unsigned int Game::CountNeighbors(int row, int col) const
 {
 	unsigned int counter = 0;
 	for (int i = -1; i <= 1; ++i) {
 		for (int j = -1; j <= 1; ++j) {
 			if (!(j == 0 && i == 0)) {
-				counter += DoesTileExsist(row + i, collum + j);
+				counter += DoesTileExist(row + i, col + j);
 			}
 		}
 	}
 	return counter;
 }
 
-void Game::RemoveTile(int Row, int Collum) {
-	const int Boardsize = NextBoard.size();
+void Game::RemoveTile(int row, int col) {
+	const int boardSize = nextBoard.size();
 	int i = 0;
-	while (i < Boardsize) {
-		if (NextBoard[i].x == Row && NextBoard[i].y == Collum) {
-			NextBoard.erase(NextBoard.begin() + i);
+	while (i < boardSize) {
+		if (nextBoard[i].x == row && nextBoard[i].y == col) {
+			nextBoard.erase(nextBoard.begin() + i);
 			return;
 		}
 		i++;
 	}
-	std::cout << "no was found";
+	std::cout << "Tile not found.";
 }
 
-int Game::returnminmax(unsigned int index, int minmax) {
+int Game::GetMinMax(unsigned int index, int minMax) const{
 
-	int output = -minmax * 2147483646;
+	int output = -minMax * 2147483646;
 	if (index == 0) {
-		for (int i = 0; i < CurrentBoard.size(); i++) {
-			output = CurrentBoard[i].x * ((minmax * CurrentBoard[i].x) >= (minmax * output)) + output * ((minmax * CurrentBoard[i].x) < (minmax * output));
+		for (int i = 0; i < currentBoard.size(); i++) {
+			output = currentBoard[i].x * ((minMax * currentBoard[i].x) >= (minMax * output)) + output * ((minMax * currentBoard[i].x) < (minMax * output));
 		}
 	}
-	else
-	{
-		for (int i = 0; i < CurrentBoard.size(); i++) {
-			output = CurrentBoard[i].y * ((minmax * CurrentBoard[i].y) >= (minmax * output)) + output * ((minmax * CurrentBoard[i].y) < (minmax * output));
+	else {
+		for (int i = 0; i < currentBoard.size(); i++) {
+			output = currentBoard[i].y * ((minMax * currentBoard[i].y) >= (minMax * output)) + output * ((minMax * currentBoard[i].y) < (minMax * output));
 		}
 	}
 	return output;
 }
 
-
-
 void Game::UpdateBoard()
-{	
-	int MaxRows = returnminmax(0, 1);
-	int MinRows = returnminmax(0, -1);
-	int MaxCollums = returnminmax(1, 1);
-	int MinCollums = returnminmax(1, -1);
+{
+	int maxRow = GetMinMax(0, 1);
+	int minRow = GetMinMax(0, -1);
+	int maxCol = GetMinMax(1, 1);
+	int minCol = GetMinMax(1, -1);
 
-	NextBoard = CurrentBoard;
+	nextBoard = currentBoard;
 
-	for (int i = MinRows-1; i <= MaxRows+1; ++i) {
-		for (int j = MinCollums -1; j <= MaxCollums+1; ++j) {
-			unsigned int Neighbors = CountNeighbors(i, j);
-			if (DoesTileExsist(i, j)) {
-				if (Neighbors != 3 && Neighbors != 2) {
+	for (int i = minRow - 1; i <= maxRow + 1; ++i) {
+		for (int j = minCol - 1; j <= maxCol + 1; ++j) {
+			unsigned int neighbors = CountNeighbors(i, j);
+			if (DoesTileExist(i, j)) {
+				if (neighbors != 3 && neighbors != 2) {
 					RemoveTile(i, j);
 				}
 			}
-			else if (Neighbors == 3) {
-				NextBoard.emplace_back(i, j);
+			else if (neighbors == 3) {
+				nextBoard.emplace_back(i, j);
 			}
 		}
 	}
-	CurrentBoard = NextBoard;
+	currentBoard = nextBoard;
 }
 
-void Game::ChangeTile(int Row,int Collum) {
-	if (DoesTileExsist(Row, Collum)) {
-		const int Boardsize = CurrentBoard.size();
+void Game::ChangeTile(int Row, int Collum) {
+	if (DoesTileExist(Row, Collum)) {
+		const int Boardsize = currentBoard.size();
 		int i = 0;
 		while (i < Boardsize) {
-			if (CurrentBoard[i].x == Row && CurrentBoard[i].y == Collum) {
-				CurrentBoard.erase(CurrentBoard.begin() + i);
+			if (currentBoard[i].x == Row && currentBoard[i].y == Collum) {
+				currentBoard.erase(currentBoard.begin() + i);
 				return;
 			}
 			i++;
 		}
 	}
 	else {
-		CurrentBoard.emplace_back(Row, Collum);
+		currentBoard.emplace_back(Row, Collum);
 	}
 }

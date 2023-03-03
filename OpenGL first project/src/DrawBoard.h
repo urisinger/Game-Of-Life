@@ -21,5 +21,5 @@ public:
 		0,1,3
 	};
 	Board();
-	void draw(std::vector<cell> inputarray);
+	void draw(std::vector<Point> inputarray);
 };
