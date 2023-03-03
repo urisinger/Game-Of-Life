@@ -19,7 +19,6 @@ public:
     void UpdateBoard();
     void ChangeTile(int row, int col);
 
-    void DrawBoard();
 
     unordered_set<pair<int,int>, hash_pair> currentBoard;
     unordered_set<pair<int,int>, hash_pair> nextBoard;

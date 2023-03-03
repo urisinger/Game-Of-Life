@@ -13,10 +13,10 @@
 
 #define X_SIZE 1920
 #define Y_SIZE 1080
-#define RATIO  1080/1920
+#define RATIO  Y_SIZE/X_SIZE
 #define MOUSETOTILE_X gameX * ((xpos / (X_SIZE))) + 1*(2*xpos>=X_SIZE) +Xoffset
 #define MOUSETOTILE_Y -gameY * (((ypos) / (Y_SIZE))-1)+1*(2*ypos<Y_SIZE)+Yoffset
-float gameX = 25;
+float gameX = 100;
 float gameY = gameX*RATIO;
 float Xoffset = -gameX/2;
 float Yoffset = -gameY/2;
@@ -33,6 +33,8 @@ double leftprevtile_Y = 0;
 double rightprevtile_X = 0;
 double rightprevtile_Y = 0;
 
+int timecounter = 0;
+
 
 bool rightmouse=false;
 
@@ -40,8 +42,8 @@ bool rightmouse=false;
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    xoffset *= 5;
-    yoffset *= 5;
+    xoffset *= 50;
+    yoffset *= 50;
     gameX += yoffset;
     gameY += yoffset* RATIO;
     Xoffset += -yoffset / 2;
@@ -63,19 +65,6 @@ static void GLCheckErrros()
     }
 }
 
-
-
-void genBoardVertexBuffer(int Row, int Collum, float OutputArray[8])
-{
-    OutputArray[0] = 2*(static_cast<float>(Row-Xoffset) / (gameX))-1;
-    OutputArray[1] = 2*(static_cast<float>(Collum - 1-Yoffset) / (gameY))-1;
-    OutputArray[2] = 2*(static_cast<float>(Row - 1- Xoffset) / (gameX))-1;
-    OutputArray[3] = 2*(static_cast<float>(Collum- Yoffset) / (gameY))-1;
-    OutputArray[4] = 2*(static_cast<float>(Row - 1- Xoffset) / (gameX))-1;
-    OutputArray[5] = 2*(static_cast<float>(Collum -1- Yoffset) / (gameY))-1;
-    OutputArray[6] = 2*(static_cast<float>(Row- Xoffset) / (gameX))-1;
-    OutputArray[7] = 2*(static_cast<float>(Collum- Yoffset) / (gameY))-1;
-}
 
 
 int main(void)
@@ -101,7 +90,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     if (glewInit() != GLEW_OK) {
         std::cout << "error!" << std::endl;
@@ -109,13 +98,9 @@ int main(void)
 
     glfwSetScrollCallback(window, scroll_callback);
     Game Board(1);
-    float pos[8];
+    std::vector<float> vertcies;
 
-    unsigned int indexs[6] =
-    {
-        0,1,2,
-        0,1,3
-    };
+    vector<unsigned int> indexs;
 
 
     // gen vertex array 
@@ -133,12 +118,17 @@ int main(void)
     _ASSERT(location != -1);
 
     //gen vertex buffer
-    VertexBuffer vb(pos, 4 * 2 * sizeof(float));
+    unsigned int vb;
+    glCreateBuffers(1, &vb);
+    glBindBuffer(GL_ARRAY_BUFFER, vb);
+    glBufferData(GL_ARRAY_BUFFER, 4 * 2 * 0 * sizeof(float), &vertcies[0], GL_STATIC_DRAW);
+    glEnableVertexArrayAttrib(vb, 0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
     glEnableVertexAttribArray(0);
 
     //create and save index buffer on gpu
-    IndexBuffer ib(indexs, 6, 1);
+    unsigned int ib;
 
     glBindVertexArray(0);
     glUseProgram(0);
@@ -153,7 +143,6 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT);
 
 
-        float pos[8];
 
         glUseProgram(shader);
 
@@ -162,33 +151,57 @@ int main(void)
         glBindVertexArray(vao);
         //draw board
 
-        for (const auto& cell : Board.currentBoard) {
+        vertcies.resize(8*Board.currentBoard.size());
+        indexs.resize(6*Board.currentBoard.size());
+        unsigned int counter = 0;
+       for (const auto& cell : Board.currentBoard) {
             //generates data for buffer
-            genBoardVertexBuffer(cell.first, cell.second, pos);
-            //
-            vb.AddData(pos, 4 * 2 * sizeof(float));
-            ib.Bind();
+           int Row = cell.first;
+           int Collum = cell.second;
+           vertcies[8*counter]=(2 * (static_cast<float>(Row - Xoffset) / (gameX)) - 1);
+           vertcies[8*counter+1]=(2 * (static_cast<float>(Collum - 1 - Yoffset) / (gameY)) - 1);
+           vertcies[8*counter+2]=(2 * (static_cast<float>(Row - 1 - Xoffset) / (gameX)) - 1);
+           vertcies[8*counter+3]=(2 * (static_cast<float>(Collum - Yoffset) / (gameY)) - 1);
+           vertcies[8*counter+4]=(2 * (static_cast<float>(Row - 1 - Xoffset) / (gameX)) - 1);
+           vertcies[8*counter+5]=(2 * (static_cast<float>(Collum - 1 - Yoffset) / (gameY)) - 1);
+           vertcies[8*counter+6]=(2 * (static_cast<float>(Row - Xoffset) / (gameX)) - 1);
+           vertcies[8*counter+7]=(2 * (static_cast<float>(Collum - Yoffset) / (gameY)) - 1);
 
-
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+           indexs[6*counter]=(4*counter);
+           indexs[6*counter+1]=(4*counter + 1);
+           indexs[6*counter+2]=(4*counter+2);
+           indexs[6*counter+3]=(4*counter);
+           indexs[6*counter+4]=(4*counter + 1);
+           indexs[6*counter+5]=(4*counter + 3);
+           counter++;
         }
+       
+       glBindVertexArray(vao);
+       glBindBuffer(GL_ARRAY_BUFFER, vb);
+       glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertcies.size(), vertcies.data(), GL_DYNAMIC_DRAW);
+
+       glCreateBuffers(1, &ib);
+       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+       glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexs.size(), &indexs[0], GL_STATIC_DRAW);
 
 
+       glDrawElements(GL_TRIANGLES, 6*counter, GL_UNSIGNED_INT, nullptr);
 
-
+       vertcies.clear();
+       indexs.clear();
 
         //fps and updateboard
         currenttime = glfwGetTime();
         timediff = currenttime - prevtime;
-        counter++;
+        timecounter++;
         if (timediff >= 1 / 30.0f) {
-            currentfps = counter / timediff;
+            currentfps = timecounter / timediff;
             prevtime = currenttime;
-            counter = 0;
             glfwSetWindowTitle(window, std::to_string(currentfps).c_str());
             if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
                 Board.UpdateBoard();
             }
+            timecounter = 0;
 
         }
 
