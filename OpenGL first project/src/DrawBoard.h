@@ -21,5 +21,5 @@ public:
 		0,1,3
 	};
 	Board();
-	void draw(std::vector<Point> inputarray);
+	void draw(std::vector<pair<int,int>,hash_pair> inputarray);
 };

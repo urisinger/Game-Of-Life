@@ -13,10 +13,11 @@
 
 #define X_SIZE 1920
 #define Y_SIZE 1080
+#define RATIO  1080/1920
 #define MOUSETOTILE_X gameX * ((xpos / (X_SIZE))) + 1*(2*xpos>=X_SIZE) +Xoffset
 #define MOUSETOTILE_Y -gameY * (((ypos) / (Y_SIZE))-1)+1*(2*ypos<=Y_SIZE)+Yoffset
 float gameX = 25;
-float gameY = 25;
+float gameY = gameX*RATIO;
 float Xoffset = -gameX/2;
 float Yoffset = -gameY/2;
 Game test(1);
@@ -26,9 +27,9 @@ Game test(1);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     gameX += yoffset;
-    gameY += yoffset;
+    gameY += yoffset* RATIO;
     Xoffset += -yoffset / 2;
-    Yoffset += -yoffset / 2;
+    Yoffset += (-yoffset * RATIO) / 2;
 }
 
 
@@ -83,7 +84,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     if (glewInit() != GLEW_OK) {
         std::cout << "error!" << std::endl;
@@ -155,9 +156,9 @@ int main(void)
         glBindVertexArray(vao);
         //draw board
 
-        for (int i = 0; i < test.currentBoard.size(); ++i) {
+        for (const auto& cell : test.currentBoard) {
             //generates data for buffer
-            genBoardVertexBuffer(test.currentBoard[i].x, test.currentBoard[i].y, pos);
+            genBoardVertexBuffer(cell.first, cell.second, pos);
             //
             vb.AddData(pos, 4 * 2 * sizeof(float));
             ib.Bind();

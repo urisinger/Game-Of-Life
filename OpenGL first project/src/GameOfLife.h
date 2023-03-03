@@ -2,25 +2,26 @@
 
 #include <vector>
 #include <iostream>
-struct Point {
-    int x, y;
-    Point(int a, int b) : x(a), y(b) {}
+#include <unordered_set>
+
+using namespace std;
+struct hash_pair {
+    size_t operator()(const std::pair<int, int>& p) const {
+        return (size_t)(p.first * 1000 + p.second); // any reasonable hash of p.first with p.second will do
+    }
 };
+
+
 class Game {
 public:
     Game(unsigned int s);
 
-    void PrintBoard();
     void UpdateBoard();
     void ChangeTile(int row, int col);
 
-    std::vector<Point> currentBoard;
-    std::vector<Point> nextBoard;
+    unordered_set<pair<int,int>, hash_pair> currentBoard;
+    unordered_set<pair<int,int>, hash_pair> nextBoard;
 
 private:
-
-    bool DoesTileExist(int row, int col) const;
-    void RemoveTile(int row, int col);
     unsigned int CountNeighbors(int row, int col) const;
-    int GetMinMax(unsigned int index, int minmax) const;
 };
