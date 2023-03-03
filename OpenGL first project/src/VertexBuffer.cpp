@@ -1,6 +1,5 @@
 #include "vertexbuffer.h"
 
-#include "DrawBoard.h"
 
 VertexBuffer::VertexBuffer(const void* data, unsigned int size) 
 {

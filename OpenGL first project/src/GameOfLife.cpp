@@ -5,6 +5,10 @@ Game::Game(unsigned int a)
 
 }
 
+void DrawBoard() {
+
+}
+
 unsigned int Game::CountNeighbors(int row, int col) const
 {
 	unsigned int counter = 0;
@@ -32,15 +36,15 @@ void Game::UpdateBoard()
 		minCol = std::min(minCol, cell.second);
 	}
 
-	nextBoard = currentBoard;
+	nextBoard.clear();
 
 	for (int i = minRow - 1; i <= maxRow + 1; ++i) {
 		for (int j = minCol - 1; j <= maxCol + 1; ++j) {
 			unsigned int neighbors = CountNeighbors(i, j);
 			pair<int, int> p = { i, j };
 			if (currentBoard.find(p) != currentBoard.end()) {
-				if (!(neighbors == 3 || neighbors == 2)) {
-					nextBoard.erase(p);
+				if ((neighbors == 3 || neighbors == 2)) {
+					nextBoard.emplace(i, j);
 				}
 			}
 			else if (neighbors == 3) {

@@ -14,24 +14,39 @@
 #define X_SIZE 1920
 #define Y_SIZE 1080
 #define RATIO  1080/1920
-#define MOUSETOTILE_X gameX * ((xpos / (X_SIZE))) + 1*(2*xpos>X_SIZE) +Xoffset
+#define MOUSETOTILE_X gameX * ((xpos / (X_SIZE))) + 1*(2*xpos>=X_SIZE) +Xoffset
 #define MOUSETOTILE_Y -gameY * (((ypos) / (Y_SIZE))-1)+1*(2*ypos<Y_SIZE)+Yoffset
 float gameX = 25;
 float gameY = gameX*RATIO;
 float Xoffset = -gameX/2;
 float Yoffset = -gameY/2;
 
+float currenttime = 0.0f;
+float prevtime = 0.0f;
+float timediff;
+unsigned int counter = 0;
+float currentfps = 0;
+
+double leftprevtile_X = 0;
+double leftprevtile_Y = 0;
+
+double rightprevtile_X = 0;
+double rightprevtile_Y = 0;
+
+
 bool rightmouse=false;
-Game test(1);
 
 
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
+    xoffset *= 5;
+    yoffset *= 5;
     gameX += yoffset;
     gameY += yoffset* RATIO;
     Xoffset += -yoffset / 2;
     Yoffset += (-yoffset * RATIO) / 2;
+    cout << gameX << endl;
 }
 
 
@@ -93,6 +108,7 @@ int main(void)
     }
 
     glfwSetScrollCallback(window, scroll_callback);
+    Game Board(1);
     float pos[8];
 
     unsigned int indexs[6] =
@@ -119,7 +135,6 @@ int main(void)
     //gen vertex buffer
     VertexBuffer vb(pos, 4 * 2 * sizeof(float));
 
-
     glEnableVertexAttribArray(0);
 
     //create and save index buffer on gpu
@@ -129,20 +144,6 @@ int main(void)
     glUseProgram(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-    float currenttime = 0.0f;
-    float prevtime = 0.0f;
-    float timediff;
-    unsigned int counter = 0;
-    float currentfps = 0;
-
-    double leftprevtile_X = 0;
-    double leftprevtile_Y = 0;
-
-    double rightprevtile_X = 0;
-    double rightprevtile_Y = 0;
-
 
 
     /* Loop until the user closes the window */
@@ -161,7 +162,7 @@ int main(void)
         glBindVertexArray(vao);
         //draw board
 
-        for (const auto& cell : test.currentBoard) {
+        for (const auto& cell : Board.currentBoard) {
             //generates data for buffer
             genBoardVertexBuffer(cell.first, cell.second, pos);
             //
@@ -175,21 +176,23 @@ int main(void)
 
 
 
-        //fps and updateboard
 
+        //fps and updateboard
         currenttime = glfwGetTime();
         timediff = currenttime - prevtime;
         counter++;
-        if (timediff >= 1 / 10.0f) {
+        if (timediff >= 1 / 30.0f) {
             currentfps = counter / timediff;
             prevtime = currenttime;
             counter = 0;
             glfwSetWindowTitle(window, std::to_string(currentfps).c_str());
             if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-                test.UpdateBoard();
+                Board.UpdateBoard();
             }
 
         }
+
+
 
         //mouse calls
         double xpos, ypos;
@@ -199,7 +202,7 @@ int main(void)
             //check if tile was already swapped
             if (!(leftprevtile_X == row && leftprevtile_Y == collum)) {
                 //swap tile
-                test.ChangeTile(row, collum);
+                Board.ChangeTile(row, collum);
                 leftprevtile_X = row, leftprevtile_Y = collum;
             }
         }

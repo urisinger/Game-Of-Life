@@ -1,7 +1,5 @@
 #include "indexbuffer.h"
 
-#include "DrawBoard.h"
-
 IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int count,unsigned int index)
     : m_Count(count)
 {
