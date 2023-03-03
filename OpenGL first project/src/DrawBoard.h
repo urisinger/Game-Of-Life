@@ -15,6 +15,11 @@ private:
 public:
 	VertexBuffer vb;
 	IndexBuffer ib;
-	Board(std::vector<cell> inputarray);
+	unsigned int indexs[6] =
+	{
+		0,1,2,
+		0,1,3
+	};
+	Board();
 	void draw(std::vector<cell> inputarray);
 };

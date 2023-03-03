@@ -16,8 +16,12 @@ static void GLCheckErrros()
     }
 }
 
-Board::Board(std::vector<cell> inputarray) {
+Board::Board(){
 
+    float pos[8];
+
+    VertexBuffer vb(pos, 4 * 2 * sizeof(float));
+    IndexBuffer ib(indexs, 6, 1);
 }
 
 

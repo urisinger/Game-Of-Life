@@ -27,8 +27,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     gameX += yoffset;
     gameY += yoffset;
-    Xoffset = -gameX / 2;
-    Yoffset = -gameY / 2;
+    Xoffset += -yoffset / 2;
+    Yoffset += -yoffset / 2;
 }
 
 
@@ -80,7 +80,7 @@ int main(void)
         return -1;
     }
 
-    /* Make the window's context current */ 
+    /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
     glfwSwapInterval(0);
@@ -134,8 +134,8 @@ int main(void)
     unsigned int counter = 0;
     float currentfps = 0;
 
-    int prevtile_X=0;
-    int prevtile_Y=0;
+    double prevtile_X = 0;
+    double prevtile_Y = 0;
 
 
 
@@ -169,36 +169,45 @@ int main(void)
 
 
 
-        //fps
+        //fps and updateboard
+
         currenttime = glfwGetTime();
         timediff = currenttime - prevtime;
         counter++;
-        if (timediff >= 1 / 30.0f) {
+        if (timediff >= 1 / 10.0f) {
             currentfps = counter / timediff;
             prevtime = currenttime;
             counter = 0;
-            if (glfwGetKey(window, GLFW_KEY_SPACE)== GLFW_PRESS) {
+            glfwSetWindowTitle(window, std::to_string(currentfps).c_str());
+            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
                 test.UpdateBoard();
             }
-            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-                double xpos, ypos;
-                glfwGetCursorPos(window, &xpos, &ypos);
-                int row = MOUSETOTILE_X, collum = MOUSETOTILE_Y;
-                if (!(prevtile_X == row && prevtile_Y == collum)) {
-                    test.ChangeTile(row, collum);
-                    prevtile_X = row, prevtile_Y = collum;
-                }
-            }
-            glfwSetWindowTitle(window, std::to_string(currentfps).c_str());
+
         }
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+        //
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        int row = MOUSETOTILE_X, collum = MOUSETOTILE_Y;
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+            if (!(prevtile_X == row && prevtile_Y == collum)) {
+                test.ChangeTile(row, collum);
+                prevtile_X = row, prevtile_Y = collum;
+            }
+        }
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+            Xoffset += (prevtile_X - row) / 60;
+            Yoffset += (prevtile_Y - collum) / 60;
+        }
 
-        /* Poll for and process events */
-        glfwPollEvents();
+
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window);
+
+            /* Poll for and process events */
+            glfwPollEvents();
+        }
+
+        glfwTerminate();
+        return 0;
     }
-
-    glfwTerminate();
-    return 0;
-}
