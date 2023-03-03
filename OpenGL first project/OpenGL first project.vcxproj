@@ -158,7 +158,6 @@
     <ClCompile Include="src\GameOfLife.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\DrawBoard.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
   </ItemGroup>
@@ -169,7 +168,6 @@
   <ItemGroup>
     <ClInclude Include="src\GameOfLife.h" />
     <ClInclude Include="src\IndexBuffer.h" />
-    <ClInclude Include="src\DrawBoard.h" />
     <ClInclude Include="src\shader.h" />
     <ClInclude Include="src\vertexbuffer.h" />
   </ItemGroup>

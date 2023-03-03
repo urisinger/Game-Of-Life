@@ -14,12 +14,14 @@
 #define X_SIZE 1920
 #define Y_SIZE 1080
 #define RATIO  1080/1920
-#define MOUSETOTILE_X gameX * ((xpos / (X_SIZE))) + 1*(2*xpos>=X_SIZE) +Xoffset
-#define MOUSETOTILE_Y -gameY * (((ypos) / (Y_SIZE))-1)+1*(2*ypos<=Y_SIZE)+Yoffset
+#define MOUSETOTILE_X gameX * ((xpos / (X_SIZE))) + 1*(2*xpos>X_SIZE) +Xoffset
+#define MOUSETOTILE_Y -gameY * (((ypos) / (Y_SIZE))-1)+1*(2*ypos<Y_SIZE)+Yoffset
 float gameX = 25;
 float gameY = gameX*RATIO;
 float Xoffset = -gameX/2;
 float Yoffset = -gameY/2;
+
+bool rightmouse=false;
 Game test(1);
 
 
@@ -135,8 +137,11 @@ int main(void)
     unsigned int counter = 0;
     float currentfps = 0;
 
-    double prevtile_X = 0;
-    double prevtile_Y = 0;
+    double leftprevtile_X = 0;
+    double leftprevtile_Y = 0;
+
+    double rightprevtile_X = 0;
+    double rightprevtile_Y = 0;
 
 
 
@@ -191,15 +196,23 @@ int main(void)
         glfwGetCursorPos(window, &xpos, &ypos);
         int row = MOUSETOTILE_X, collum = MOUSETOTILE_Y;
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-            if (!(prevtile_X == row && prevtile_Y == collum)) {
+            //check if tile was already swapped
+            if (!(leftprevtile_X == row && leftprevtile_Y == collum)) {
+                //swap tile
                 test.ChangeTile(row, collum);
-                prevtile_X = row, prevtile_Y = collum;
+                leftprevtile_X = row, leftprevtile_Y = collum;
             }
         }
+
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+            if (rightmouse == false) {
+                rightprevtile_X = row;
+                rightprevtile_Y = collum;
+                rightmouse = true;
+            }
             //upper limit
-            float mousespeedX = 10 * (prevtile_X - row) / currentfps > gameX/currentfps ? gameX / currentfps : 10 * (prevtile_X - row) / currentfps;
-            float mousespeedY = 10 * (prevtile_Y - collum) / currentfps > gameX / currentfps ? gameX / currentfps : 10 * (prevtile_Y - collum) / currentfps;
+            float mousespeedX = 10 * (rightprevtile_X - row) / currentfps > gameX/currentfps ? gameX / currentfps : 10 * (rightprevtile_X - row) / currentfps;
+            float mousespeedY = 10 * (rightprevtile_Y - collum) / currentfps > gameX / currentfps ? gameX / currentfps : 10 * (rightprevtile_Y - collum) / currentfps;
 
             //lower limit 
             mousespeedX = mousespeedX < -gameX / currentfps ? -gameX / currentfps : mousespeedX;
@@ -207,6 +220,9 @@ int main(void)
 
             Xoffset += mousespeedX;
             Yoffset += mousespeedY;
+        }
+        else {
+            rightmouse = false;
         }
 
 
