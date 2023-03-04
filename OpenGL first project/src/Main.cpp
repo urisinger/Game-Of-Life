@@ -11,11 +11,17 @@
 #include "IndexBuffer.h"
 #include "shader.h"
 
-#define X_SIZE 1920
-#define Y_SIZE 1080
-#define RATIO  Y_SIZE/X_SIZE
-#define MOUSETOTILE_X gameX * ((xpos / (X_SIZE))) + 1*(2*xpos>=X_SIZE) +Xoffset
-#define MOUSETOTILE_Y -gameY * (((ypos) / (Y_SIZE))-1)+1*(2*ypos<Y_SIZE)+Yoffset
+
+
+#define RATIO  screen_y/screen_x
+#define MOUSETOTILE_X gameX * ((xpos / (screen_x))) + 1*(gameX * ((xpos / (screen_x)))+Xoffset >= 0)+Xoffset
+#define MOUSETOTILE_Y -gameY * (((ypos) / (screen_y))-1)+1*(-gameY * (((ypos) / (screen_y))-1)+Yoffset>=0)+Yoffset
+
+unsigned int screen_y = 1080;
+unsigned int screen_x = 1920;
+
+
+
 float gameX = 100;
 float gameY = gameX*RATIO;
 float Xoffset = -gameX/2;
@@ -35,10 +41,7 @@ double rightprevtile_Y = 0;
 
 int timecounter = 0;
 
-
 bool rightmouse=false;
-
-
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
@@ -65,7 +68,7 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(X_SIZE, Y_SIZE, "Game of life", NULL, NULL);
+    window = glfwCreateWindow(screen_x, screen_y, "Game of life", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -75,7 +78,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     if (glewInit() != GLEW_OK) {
         std::cout << "error!" << std::endl;
@@ -130,7 +133,7 @@ int main(void)
         glBindVertexArray(vao);
         //draw board
 
-                    //generates data for buffer
+        //generates data for buffer
 
         vertcies.resize(8*Board.currentBoard.size());
         indecies.resize(6*Board.currentBoard.size());
