@@ -21,11 +21,11 @@ float gameY = gameX*RATIO;
 float Xoffset = -gameX/2;
 float Yoffset = -gameY/2;
 
-float currenttime = 0.0f;
-float prevtime = 0.0f;
-float timediff;
+double currenttime = 0.0f;
+double prevtime = 0.0f;
+double timediff;
 unsigned int counter = 0;
-float currentfps = 0;
+int currentfps = 0;
 
 double leftprevtile_X = 0;
 double leftprevtile_Y = 0;
@@ -48,21 +48,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     gameY += yoffset* RATIO;
     Xoffset += -yoffset / 2;
     Yoffset += (-yoffset * RATIO) / 2;
-    cout << gameX << endl;
-}
-
-
-static void GLclearerrors()
-{
-    while (glGetError());
-}
-
-static void GLCheckErrros()
-{
-    while (GLenum error = glGetError())
-    {
-        std::cout << "[opengl error](" << error << ")" << std::endl;
-    }
 }
 
 
@@ -100,7 +85,7 @@ int main(void)
     Game Board(1);
     std::vector<float> vertcies;
 
-    vector<unsigned int> indexs;
+    vector<unsigned int> indecies;
 
 
     // gen vertex array 
@@ -118,17 +103,11 @@ int main(void)
     _ASSERT(location != -1);
 
     //gen vertex buffer
-    unsigned int vb;
-    glCreateBuffers(1, &vb);
-    glBindBuffer(GL_ARRAY_BUFFER, vb);
-    glBufferData(GL_ARRAY_BUFFER, 4 * 2 * 0 * sizeof(float), &vertcies[0], GL_STATIC_DRAW);
-    glEnableVertexArrayAttrib(vb, 0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+    VertexBuffer vb(1);
 
-    glEnableVertexAttribArray(0);
 
     //create and save index buffer on gpu
-    unsigned int ib;
+    IndexBuffer ib(1);
 
     glBindVertexArray(0);
     glUseProgram(0);
@@ -151,11 +130,13 @@ int main(void)
         glBindVertexArray(vao);
         //draw board
 
+                    //generates data for buffer
+
         vertcies.resize(8*Board.currentBoard.size());
-        indexs.resize(6*Board.currentBoard.size());
+        indecies.resize(6*Board.currentBoard.size());
         unsigned int counter = 0;
        for (const auto& cell : Board.currentBoard) {
-            //generates data for buffer
+
            int Row = cell.first;
            int Collum = cell.second;
            vertcies[8*counter]=(2 * (static_cast<float>(Row - Xoffset) / (gameX)) - 1);
@@ -167,34 +148,30 @@ int main(void)
            vertcies[8*counter+6]=(2 * (static_cast<float>(Row - Xoffset) / (gameX)) - 1);
            vertcies[8*counter+7]=(2 * (static_cast<float>(Collum - Yoffset) / (gameY)) - 1);
 
-           indexs[6*counter]=(4*counter);
-           indexs[6*counter+1]=(4*counter + 1);
-           indexs[6*counter+2]=(4*counter+2);
-           indexs[6*counter+3]=(4*counter);
-           indexs[6*counter+4]=(4*counter + 1);
-           indexs[6*counter+5]=(4*counter + 3);
+           indecies[6*counter]=(4*counter);
+           indecies[6*counter+1]=(4*counter + 1);
+           indecies[6*counter+2]=(4*counter+2);
+           indecies[6*counter+3]=(4*counter);
+           indecies[6*counter+4]=(4*counter + 1);
+           indecies[6*counter+5]=(4*counter + 3);
            counter++;
         }
        
-       glBindVertexArray(vao);
-       glBindBuffer(GL_ARRAY_BUFFER, vb);
-       glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertcies.size(), vertcies.data(), GL_DYNAMIC_DRAW);
 
-       glCreateBuffers(1, &ib);
-       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
-       glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indexs.size(), &indexs[0], GL_STATIC_DRAW);
+       vb.AddData(vertcies.data(),sizeof(float) * vertcies.size());
+       ib.adddata(indecies.data(), indecies.size());
 
 
        glDrawElements(GL_TRIANGLES, 6*counter, GL_UNSIGNED_INT, nullptr);
 
        vertcies.clear();
-       indexs.clear();
+       indecies.clear();
 
         //fps and updateboard
         currenttime = glfwGetTime();
         timediff = currenttime - prevtime;
         timecounter++;
-        if (timediff >= 1 / 10.0f) {
+        if (timediff >= 1 /10.0) {
             currentfps = timecounter / timediff;
             prevtime = currenttime;
             glfwSetWindowTitle(window, std::to_string(currentfps).c_str());
@@ -221,6 +198,7 @@ int main(void)
         }
 
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+            //check if mouse already pressed
             if (rightmouse == false) {
                 rightprevtile_X = row;
                 rightprevtile_Y = collum;

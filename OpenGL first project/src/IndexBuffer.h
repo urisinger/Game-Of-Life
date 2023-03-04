@@ -6,14 +6,12 @@ class IndexBuffer
 {
 private:
 	unsigned int BufferID;
-	unsigned int m_Count;
 public:
-	IndexBuffer(const unsigned int* data, unsigned int count, unsigned int index);
+	IndexBuffer(int a);
 	~IndexBuffer();
 	
-	void adddata(const unsigned int* data, unsigned int count, unsigned int index);
+	void adddata(const unsigned int* data, unsigned int count);
 	void Bind() const;
 	void UnBind() const;
 
-	inline unsigned int getcount() const { return m_Count; };
 };

@@ -6,7 +6,7 @@ class VertexBuffer
 private:
 	unsigned int BufferID;
 public:
-	VertexBuffer(const void* data, unsigned int size);
+	VertexBuffer(int a);
 	~VertexBuffer();
 
 	void AddData(const void* data, unsigned int size);
