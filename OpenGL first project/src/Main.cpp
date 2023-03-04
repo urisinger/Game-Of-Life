@@ -90,7 +90,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     if (glewInit() != GLEW_OK) {
         std::cout << "error!" << std::endl;
@@ -194,7 +194,7 @@ int main(void)
         currenttime = glfwGetTime();
         timediff = currenttime - prevtime;
         timecounter++;
-        if (timediff >= 1 / 30.0f) {
+        if (timediff >= 1 / 10.0f) {
             currentfps = timecounter / timediff;
             prevtime = currenttime;
             glfwSetWindowTitle(window, std::to_string(currentfps).c_str());
