@@ -11,54 +11,25 @@
 #include "IndexBuffer.h"
 #include "shader.h"
 
+#include "Input.h"
+
+#include "globals.h"
+
 
 
 #define RATIO  screen_y/screen_x
 #define MOUSETOTILE_X gameX * ((xpos / (screen_x))) + 1*(gameX * ((xpos / (screen_x)))+Xoffset >= 0)+Xoffset
 #define MOUSETOTILE_Y -gameY * (((ypos) / (screen_y))-1)+1*(-gameY * (((ypos) / (screen_y))-1)+Yoffset>=0)+Yoffset
 
-unsigned int screen_y = 1080;
-unsigned int screen_x = 1920;
-
-
-
-float gameX = 100;
-float gameY = gameX*RATIO;
-float Xoffset = -gameX/2;
-float Yoffset = -gameY/2;
-
-double currenttime = 0.0f;
-double prevtime = 0.0f;
-double timediff;
-unsigned int counter = 0;
-int currentfps = 0;
-
-double leftprevtile_X = 0;
-double leftprevtile_Y = 0;
-
-double rightprevtile_X = 0;
-double rightprevtile_Y = 0;
-
-int timecounter = 0;
 
 bool rightmouse=false;
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    xoffset *= 50;
-    yoffset *= 50;
-    gameX += yoffset;
-    gameY += yoffset* RATIO;
-    Xoffset += -yoffset / 2;
-    Yoffset += (-yoffset * RATIO) / 2;
-}
 
 
 
 int main(void)
 {
     GLFWwindow* window;
-
+    
 
     /* Initialize the library */
     if (!glfwInit())
@@ -84,12 +55,35 @@ int main(void)
         std::cout << "error!" << std::endl;
     }
 
+
+
     glfwSetScrollCallback(window, scroll_callback);
+
+    gameX = 100;
+    gameY = gameX * RATIO;
+    Xoffset = -gameX / 2;
+    Yoffset = -gameY / 2;
+
     Game Board(1);
     std::vector<float> vertcies;
 
     vector<unsigned int> indecies;
 
+
+
+    double currenttime = 0.0f;
+    double prevtime = 0.0f;
+    double timediff;
+    int timecounter = 0;
+    int currentfps = 0;
+
+    double leftprevtile_X = 0;
+    double leftprevtile_Y = 0;
+
+    double rightprevtile_X = 0;
+    double rightprevtile_Y = 0;
+
+    unsigned int counter = 0;
 
     // gen vertex array 
     unsigned int vao;
@@ -208,8 +202,8 @@ int main(void)
                 rightmouse = true;
             }
             //upper limit
-            float mousespeedX = 10 * (rightprevtile_X - row) / currentfps > gameX/currentfps ? gameX / currentfps : 10 * (rightprevtile_X - row) / currentfps;
-            float mousespeedY = 10 * (rightprevtile_Y - collum) / currentfps > gameX / currentfps ? gameX / currentfps : 10 * (rightprevtile_Y - collum) / currentfps;
+            double mousespeedX = 10 * (rightprevtile_X - row) / currentfps > gameX/currentfps ? gameX / currentfps : 10 * (rightprevtile_X - row) / currentfps;
+            double mousespeedY = 10 * (rightprevtile_Y - collum) / currentfps > gameX / currentfps ? gameX / currentfps : 10 * (rightprevtile_Y - collum) / currentfps;
 
             //lower limit 
             mousespeedX = mousespeedX < -gameX / currentfps ? -gameX / currentfps : mousespeedX;
