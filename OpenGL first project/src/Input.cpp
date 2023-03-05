@@ -44,8 +44,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             rightprevtile_Y = MOUSETOTILE_Y;
             return;
         }
-        rightmouse = false;
-//        coppybrush();
+            rightmouse = false;
+         brush.clear();
+           coppybrush();
     }
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -85,9 +86,6 @@ void mosuecalls(double currentfps) {
             Xoffset += mousespeedX;
             Yoffset += mousespeedY;
         }
-        else {
-
-        }
     }
 
 }
@@ -96,7 +94,7 @@ void paintbrush(int row,int collum) {
     for (int i = 0; i < brushsizex; i++) {
         for (int j = 0; j < brushsizey; j++) {
             if (brush[i * brushsizey + j]) {
-                Board.currentBoard.emplace(row + i, collum + j);
+                Board.currentBoard.emplace(row + i-brushsizex/2, collum + j-brushsizey/2);
             }
         }
     }
@@ -104,14 +102,13 @@ void paintbrush(int row,int collum) {
 
 
 void coppybrush() {
-    brushsizex = abs(rightprevtile_X - static_cast<int>(MOUSETOTILE_X))-1;
-    brushsizey = abs(rightprevtile_Y- static_cast<int>(MOUSETOTILE_Y))-1;
+    brushsizex = abs(rightprevtile_X - (MOUSETOTILE_X));
+    brushsizey = abs(rightprevtile_Y- (MOUSETOTILE_Y));
 
-    for (int i = rightprevtile_X; i < static_cast<int>(MOUSETOTILE_X); i++) {
-        for (int j = rightprevtile_Y; j < static_cast<int>(MOUSETOTILE_Y); j++) {
-            brush.clear();
-            brush.resize(i * j);
-            brush[i*brushsizey+j]=(Board.currentBoard.find({i, j})!=Board.currentBoard.end());
+    brush.resize(brushsizex * brushsizey);
+    for (int i = 0; i < brushsizex; i++) {
+            for (int j = 0; j < brushsizey; j++) {
+                brush[i*brushsizey+j]=((Board.currentBoard.find({i*(2*(rightprevtile_X - (MOUSETOTILE_X)>0)-1) + (int)MOUSETOTILE_X, j*(2*(rightprevtile_Y - (MOUSETOTILE_Y) > 0)-1) + (int)MOUSETOTILE_Y}) != Board.currentBoard.end()));
         }
     }
 }
