@@ -17,16 +17,37 @@
 
 
 
-#define RATIO  screen_y/screen_x
-#define MOUSETOTILE_X gameX * ((xpos / (screen_x))) + 1*(gameX * ((xpos / (screen_x)))+Xoffset >= 0)+Xoffset
-#define MOUSETOTILE_Y -gameY * (((ypos) / (screen_y))-1)+1*(-gameY * (((ypos) / (screen_y))-1)+Yoffset>=0)+Yoffset
+unsigned int screen_y = 1080;
+unsigned int screen_x = 1920;
+double gameX = 100;
+double gameY = gameX * RATIO;
+double Xoffset = -gameX / 2;
+double Yoffset = -gameY / 2;
+
+int leftprevtile_X = 0;
+int leftprevtile_Y = 0;
+
+int rightprevtile_X = 0;
+int rightprevtile_Y = 0;
+
+int rightshiftprevtile_Y=0;
+int rightshiftprevtile_X=0;
+double xpos, ypos;
+
+vector <bool> brush={1};
+int brushsizex=1;
+int brushsizey=1;
+
+bool shiftpressed=false;
+bool leftmouse = false;
+bool rightmouse = false;
+
+Game Board(1);
 
 
-bool rightmouse=false;
 
 
-
-int main(void)
+int WinMain(void)
 {
     GLFWwindow* window;
     
@@ -58,14 +79,12 @@ int main(void)
 
 
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetKeyCallback(window, key_callback);
 
-    gameX = 100;
-    gameY = gameX * RATIO;
-    Xoffset = -gameX / 2;
-    Yoffset = -gameY / 2;
 
-    Game Board(1);
-    std::vector<float> vertcies;
+
+    vector<float> vertcies;
 
     vector<unsigned int> indecies;
 
@@ -77,11 +96,6 @@ int main(void)
     int timecounter = 0;
     int currentfps = 0;
 
-    double leftprevtile_X = 0;
-    double leftprevtile_Y = 0;
-
-    double rightprevtile_X = 0;
-    double rightprevtile_Y = 0;
 
     unsigned int counter = 0;
 
@@ -168,7 +182,7 @@ int main(void)
         currenttime = glfwGetTime();
         timediff = currenttime - prevtime;
         timecounter++;
-        if (timediff >= 1 /10.0) {
+        if (timediff >= 1 /20.0) {
             currentfps = timecounter / timediff;
             prevtime = currenttime;
             glfwSetWindowTitle(window, std::to_string(currentfps).c_str());
@@ -182,39 +196,10 @@ int main(void)
 
 
         //mouse calls
-        double xpos, ypos;
+
         glfwGetCursorPos(window, &xpos, &ypos);
-        int row = MOUSETOTILE_X, collum = MOUSETOTILE_Y;
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-            //check if tile was already swapped
-            if (!(leftprevtile_X == row && leftprevtile_Y == collum)) {
-                //swap tile
-                Board.ChangeTile(row, collum);
-                leftprevtile_X = row, leftprevtile_Y = collum;
-            }
-        }
 
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-            //check if mouse already pressed
-            if (rightmouse == false) {
-                rightprevtile_X = row;
-                rightprevtile_Y = collum;
-                rightmouse = true;
-            }
-            //upper limit
-            double mousespeedX = 10 * (rightprevtile_X - row) / currentfps > gameX/currentfps ? gameX / currentfps : 10 * (rightprevtile_X - row) / currentfps;
-            double mousespeedY = 10 * (rightprevtile_Y - collum) / currentfps > gameX / currentfps ? gameX / currentfps : 10 * (rightprevtile_Y - collum) / currentfps;
-
-            //lower limit 
-            mousespeedX = mousespeedX < -gameX / currentfps ? -gameX / currentfps : mousespeedX;
-            mousespeedY = mousespeedY < -gameX / currentfps ? -gameX / currentfps : mousespeedY;
-
-            Xoffset += mousespeedX;
-            Yoffset += mousespeedY;
-        }
-        else {
-            rightmouse = false;
-        }
+        mosuecalls(currentfps);
 
 
             /* Swap front and back buffers */
