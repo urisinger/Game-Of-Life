@@ -47,7 +47,7 @@ Game Board(1);
 
 
 
-int WinMain(void)
+int main(void)
 {
     GLFWwindow* window;
     
@@ -105,7 +105,6 @@ int WinMain(void)
     glBindVertexArray(vao);
 
     //setup shader
-    Shader sh("res/shader/vertex.shader","res/shader/fragment.shader");
 
     //gen vertex buffer
     VertexBuffer vb(1);
@@ -113,6 +112,8 @@ int WinMain(void)
 
     //create and save index buffer on gpu
     IndexBuffer ib(1);
+
+    Shader sh("res/shader/vertex.shader", "res/shader/fragment.shader");
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

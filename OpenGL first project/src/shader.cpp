@@ -12,16 +12,16 @@ Shader::Shader(std::string VertexFilePath, std::string FragmentFilePath)
     glLinkProgram(Renderer_ID);
     glValidateProgram(Renderer_ID);
 
-    glUseProgram(Renderer_ID);
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
 
     location = glGetUniformLocation(Renderer_ID, "u_color");
+
     _ASSERT(location == -1);
 
 
     glUniform4f(location, 1.0f, 1.0f, 1.0f, 1.0f);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
 }
 
 void Shader::bind() {
