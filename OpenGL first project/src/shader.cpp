@@ -1,6 +1,50 @@
 #include "shader.h"
 
-std::string openshader(const char* filePath) {
+
+Shader::Shader(std::string VertexFilePath, std::string FragmentFilePath)
+{
+    Renderer_ID = glCreateProgram();
+    unsigned int vs = compileshader(GL_VERTEX_SHADER, openshader(VertexFilePath));
+    unsigned int fs = compileshader(GL_FRAGMENT_SHADER, openshader(FragmentFilePath));
+
+    glAttachShader(Renderer_ID, vs);
+    glAttachShader(Renderer_ID, fs);
+    glLinkProgram(Renderer_ID);
+    glValidateProgram(Renderer_ID);
+
+    glUseProgram(Renderer_ID);
+
+    location = glGetUniformLocation(Renderer_ID, "u_color");
+    _ASSERT(location == -1);
+
+
+    glUniform4f(location, 1.0f, 1.0f, 1.0f, 1.0f);
+
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+}
+
+void Shader::bind() {
+    glUseProgram(Renderer_ID);
+}
+
+void Shader::unbind() {
+    glUseProgram(0);
+}
+
+
+void Shader::SetUniform(float f1, float f2, float f3, float f4) {
+    glUniform4f(location, f1, f2, f3, f4);
+}
+
+
+Shader::~Shader() {
+    glDeleteProgram(Renderer_ID);
+}
+
+
+
+std::string Shader::openshader(std::string filePath) {
     std::string content;
     std::ifstream fileStream(filePath, std::ios::in);
 
@@ -19,7 +63,7 @@ std::string openshader(const char* filePath) {
     return content;
 }
 
-unsigned int compileshader(unsigned int type, const std::string& source) {
+unsigned int Shader::compileshader(unsigned int type, const std::string& source) {
     unsigned int id = glCreateShader(type);
     const char* src = source.c_str();
     glShaderSource(id, 1, &src, nullptr);
@@ -43,19 +87,4 @@ unsigned int compileshader(unsigned int type, const std::string& source) {
 }
 
 
-unsigned int CreateShader()
-{
-    unsigned int program = glCreateProgram();
-    unsigned int vs = compileshader(GL_VERTEX_SHADER, openshader("res/shader/vertex.shader"));
-    unsigned int fs = compileshader(GL_FRAGMENT_SHADER, openshader("res/shader/fragment.shader"));
 
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-    glValidateProgram(program);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
-
-    return program;
-}

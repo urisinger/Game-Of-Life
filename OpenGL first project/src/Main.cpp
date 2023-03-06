@@ -105,13 +105,7 @@ int WinMain(void)
     glBindVertexArray(vao);
 
     //setup shader
-    unsigned int shader = CreateShader();
-    glUseProgram(shader);
-
-
-    //setup uniform
-    int location = glGetUniformLocation(shader, "u_color");
-    _ASSERT(location != -1);
+    Shader sh("res/shader/vertex.shader","res/shader/fragment.shader");
 
     //gen vertex buffer
     VertexBuffer vb(1);
@@ -121,10 +115,9 @@ int WinMain(void)
     IndexBuffer ib(1);
 
     glBindVertexArray(0);
-    glUseProgram(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+    sh.unbind();
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -134,9 +127,7 @@ int WinMain(void)
 
 
 
-        glUseProgram(shader);
-
-        glUniform4f(location, 1.0f, 1.0f, 1.0f, 1.0f);
+        sh.bind();
 
         glBindVertexArray(vao);
         //draw board
@@ -208,7 +199,6 @@ int WinMain(void)
             /* Poll for and process events */
             glfwPollEvents();
         }
-    glDeleteProgram(shader);
         glfwTerminate();
         return 0;
     }

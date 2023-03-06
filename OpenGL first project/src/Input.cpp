@@ -27,6 +27,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             shiftpressed = false;
         }
     }
+
+    if (key == GLFW_KEY_R) {
+        brush = { 1 };
+        brushsizex = 1;
+        brushsizey = 1;
+    }
 }
 
 
@@ -46,7 +52,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         }
             rightmouse = false;
          brush.clear();
-           coppybrush();
+         coppybrush();
     }
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -76,8 +82,8 @@ void mosuecalls(double currentfps) {
     if (rightmouse) {
         if (shiftpressed) {
             //upper limit
-            double mousespeedX = 10 * (rightprevtile_X - row) / currentfps > gameX / currentfps ? gameX / currentfps : 10 * (rightprevtile_X - row) / currentfps;
-            double mousespeedY = 10 * (rightprevtile_Y - collum) / currentfps > gameX / currentfps ? gameX / currentfps : 10 * (rightprevtile_Y - collum) / currentfps;
+            double mousespeedX = 10 * (rightshiftprevtile_X - row) / currentfps > gameX / currentfps ? gameX / currentfps : 10 * (rightshiftprevtile_X - row) / currentfps;
+            double mousespeedY = 10 * (rightshiftprevtile_Y - collum) / currentfps > gameX / currentfps ? gameX / currentfps : 10 * (rightshiftprevtile_Y - collum) / currentfps;
 
             //lower limit 
             mousespeedX = mousespeedX < -gameX / currentfps ? -gameX / currentfps : mousespeedX;
