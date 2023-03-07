@@ -30,6 +30,7 @@ extern int rightshiftprevtile_X;
 extern int rightshiftprevtile_Y;
 
 extern bool rightmouse;
+extern bool ereasemode;
 extern bool leftmouse;
 extern bool shiftpressed;
 extern double xpos, ypos;

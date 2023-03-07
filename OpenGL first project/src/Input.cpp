@@ -33,6 +33,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         brushsizex = 1;
         brushsizey = 1;
     }
+    
+    if (key == GLFW_KEY_C) {
+        ereasemode =!ereasemode;
+    }
 }
 
 
@@ -100,7 +104,12 @@ void paintbrush(int row,int collum) {
     for (int i = 0; i < brushsizex; i++) {
         for (int j = 0; j < brushsizey; j++) {
             if (brush[i * brushsizey + j]) {
-                Board.currentBoard.emplace(row + i-brushsizex/2, collum + j-brushsizey/2);
+                if (!ereasemode) {
+                    Board.currentBoard.emplace(row + i - brushsizex / 2, collum + j - brushsizey / 2);
+                }
+                else {
+                    Board.currentBoard.erase({ row + i - brushsizex / 2, collum + j - brushsizey / 2 });
+                }
             }
         }
     }

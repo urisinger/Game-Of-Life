@@ -41,13 +41,14 @@ int brushsizey=1;
 bool shiftpressed=false;
 bool leftmouse = false;
 bool rightmouse = false;
+bool ereasemode = false;
 
 Game Board(1);
 
 
 
 
-int main(void)
+int WinMain(void)
 {
     GLFWwindow* window;
     
@@ -70,7 +71,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     if (glewInit() != GLEW_OK) {
         std::cout << "error!" << std::endl;
@@ -132,7 +133,7 @@ int main(void)
 
         glBindVertexArray(vao);
         //draw board
-
+        sh.SetUniform(1.0f, 1.0f, 1.0f, 1.0f);
         //generates data for buffer
 
         vertcies.resize(8*Board.currentBoard.size());
@@ -194,11 +195,11 @@ int main(void)
         mosuecalls(currentfps);
 
 
-            /* Swap front and back buffers */
-            glfwSwapBuffers(window);
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
 
-            /* Poll for and process events */
-            glfwPollEvents();
+        /* Poll for and process events */
+        glfwPollEvents();
         }
         glfwTerminate();
         return 0;

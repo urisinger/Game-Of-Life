@@ -6,7 +6,7 @@
 
 class Shader {
 public:
-	Shader(std::string VertexFilePath, std::string FragmentFilePath);
+	Shader(const std::string& vertexFilePath, const std::string& fragmentFilePath);
 	~Shader();
 
 
@@ -16,7 +16,7 @@ public:
 
 private:
 	unsigned int Renderer_ID;
-	int location;
-	unsigned int compileshader(unsigned int type, const std::string& source);
-	std::string openshader(std::string filepath);
+	unsigned int location;
+	unsigned int CompileShader(unsigned int type, const std::string& source);
+	std::string OpenShader(std::string filepath);
 };

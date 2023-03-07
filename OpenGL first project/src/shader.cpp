@@ -1,26 +1,29 @@
 #include "shader.h"
 
 
-Shader::Shader(std::string VertexFilePath, std::string FragmentFilePath)
+Shader::Shader(const std::string& vertex_file_path, const std::string& fragment_file_path)
 {
+    // Create the shader program
     Renderer_ID = glCreateProgram();
-    unsigned int vs = compileshader(GL_VERTEX_SHADER, openshader(VertexFilePath));
-    unsigned int fs = compileshader(GL_FRAGMENT_SHADER, openshader(FragmentFilePath));
 
-    glAttachShader(Renderer_ID, vs);
-    glAttachShader(Renderer_ID, fs);
+    // Compile the vertex and fragment shaders
+    unsigned int vertex_shader = CompileShader(GL_VERTEX_SHADER, OpenShader(vertex_file_path));
+    unsigned int fragment_shader = CompileShader(GL_FRAGMENT_SHADER, OpenShader(fragment_file_path));
+
+    // Attach the shaders to the program and link it
+    glAttachShader(Renderer_ID, vertex_shader);
+    glAttachShader(Renderer_ID, fragment_shader);
     glLinkProgram(Renderer_ID);
     glValidateProgram(Renderer_ID);
 
-    glDeleteShader(vs);
-    glDeleteShader(fs);
 
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
 
+    // Get the location of the "u_color" uniform
     location = glGetUniformLocation(Renderer_ID, "u_color");
 
-    _ASSERT(location == -1);
-
-
+    // Set the initial value of the "u_color" uniform
     glUniform4f(location, 1.0f, 1.0f, 1.0f, 1.0f);
 }
 
@@ -44,7 +47,7 @@ Shader::~Shader() {
 
 
 
-std::string Shader::openshader(std::string filePath) {
+std::string Shader::OpenShader(std::string filePath) {
     std::string content;
     std::ifstream fileStream(filePath, std::ios::in);
 
@@ -63,7 +66,7 @@ std::string Shader::openshader(std::string filePath) {
     return content;
 }
 
-unsigned int Shader::compileshader(unsigned int type, const std::string& source) {
+unsigned int Shader::CompileShader(unsigned int type, const std::string& source) {
     unsigned int id = glCreateShader(type);
     const char* src = source.c_str();
     glShaderSource(id, 1, &src, nullptr);
