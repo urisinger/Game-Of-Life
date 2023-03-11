@@ -7,7 +7,7 @@ class IndexBuffer
 private:
 	unsigned int BufferID;
 public:
-	IndexBuffer(int a);
+	IndexBuffer();
 	~IndexBuffer();
 	
 	void adddata(const unsigned int* data, unsigned int count);

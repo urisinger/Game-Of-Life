@@ -1,10 +1,5 @@
 #include "GameOfLife.h"
 
-Game::Game(unsigned int a)
-{
-
-}
-
 
 unsigned int Game::CountNeighbors(int row, int col) const
 {

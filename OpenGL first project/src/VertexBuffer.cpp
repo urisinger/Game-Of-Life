@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-VertexBuffer::VertexBuffer(int a) 
+VertexBuffer::VertexBuffer() 
 {
     glCreateBuffers(1, &BufferID);
     glBindBuffer(GL_ARRAY_BUFFER, BufferID);

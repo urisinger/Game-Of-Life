@@ -14,7 +14,7 @@ struct hash_pair {
 
 class Game {
 public:
-    Game(unsigned int s);
+    Game() {};
 
     void UpdateBoard();
     void ChangeTile(int row, int col);

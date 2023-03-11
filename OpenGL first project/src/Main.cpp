@@ -43,7 +43,7 @@ bool leftmouse = false;
 bool rightmouse = false;
 bool ereasemode = false;
 
-Game Board(1);
+Game Board;
 
 
 
@@ -108,11 +108,11 @@ int WinMain(void)
     //setup shader
 
     //gen vertex buffer
-    VertexBuffer vb(1);
+    VertexBuffer vb;
 
 
     //create and save index buffer on gpu
-    IndexBuffer ib(1);
+    IndexBuffer ib;
 
     Shader sh("res/shader/vertex.shader", "res/shader/fragment.shader");
 

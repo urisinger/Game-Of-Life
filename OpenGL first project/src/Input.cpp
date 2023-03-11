@@ -34,8 +34,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         brushsizey = 1;
     }
     
-    if (key == GLFW_KEY_C) {
-        ereasemode =!ereasemode;
+    if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+        ereasemode = !ereasemode;
     }
 }
 
