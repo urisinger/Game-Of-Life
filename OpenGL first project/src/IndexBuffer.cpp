@@ -1,6 +1,6 @@
 #include "indexbuffer.h"
 
-IndexBuffer::IndexBuffer(int a)
+IndexBuffer::IndexBuffer()
 {
     glCreateBuffers(1, &BufferID);
 }
